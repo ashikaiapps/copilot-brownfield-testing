@@ -27,6 +27,15 @@ jobs:
         run: npm run render && git diff --exit-code -- index.html
       - run: npx playwright install --with-deps chromium
       - run: npm test
+      - name: Summarize actual test results
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from "node:fs";
+          const { stats } = JSON.parse(readFileSync("test-results/results.json", "utf8"));
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `## Regression results\n18 scenarios across desktop and mobile Chromium.\n\n| Passed | Failed | Flaky | Skipped |\n|---|---|---|---|\n| ${stats.expected} | ${stats.unexpected} | ${stats.flaky} | ${stats.skipped} |\n\nDownload playwright-results for the full report.\n`);
+          JS
       - name: Preserve test evidence
         if: always()
         uses: actions/upload-artifact@v4

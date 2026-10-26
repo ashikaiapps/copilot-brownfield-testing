@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 test("PAGE-01: complete ten-stage tutorial and handout", async ({ page, request }) => {
   await page.goto("/");
   await expect(page).toHaveTitle("Brownfield testing with GitHub Copilot");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("From brownfield application to a trusted automated test suite");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("From legacy code to release confidence");
   await expect(page.locator("section[data-stage]")).toHaveCount(10);
   for (let stage = 1; stage <= 10; stage++) {
     const section = page.locator(`section[data-stage="${stage}"]`);
@@ -124,4 +124,148 @@ test("PAGE-08: no browser errors, failed requests, or missing local resources", 
   }
   await expect(page.getByRole("heading", { name: "12. References and community resources" })).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("PAGE-09: bookmarked stage survives a page reload", async ({ page }) => {
+  await page.goto("/#stage-8");
+  await expect(page.locator("#stage-8")).toBeInViewport();
+  await page.reload();
+  await expect(page).toHaveURL(/#stage-8$/);
+  await expect(page.locator("#stage-8")).toBeInViewport();
+  await expect(page.locator('section[data-stage="8"] pre code')).toContainText("Implement Playwright coverage");
+});
+
+test("PAGE-10: chapter navigation and back-to-top reach their destinations", async ({ page }) => {
+  await page.goto("/");
+  const navigation = page.getByRole("navigation", { name: "Presentation navigation" });
+  for (const [label, target] of [
+    ["Overview", "overview"], ["10 stages", "tutorial"], ["Coverage", "coverage"],
+    ["Skills", "skills"], ["Demo & CI", "demo"], ["References", "references"],
+  ]) {
+    await navigation.getByRole("link", { name: label, exact: true }).click();
+    await expect(page.locator(`#${target}`)).toBeInViewport();
+  }
+  await page.getByRole("link", { name: "back to top", exact: true }).click();
+  await expect(page.getByRole("main")).toBeFocused();
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+});
+
+test.describe("Progressive enhancement", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("PAGE-11: tutorial and navigation remain usable without JavaScript", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("From legacy code to release confidence");
+    await expect(page.locator("section[data-stage]")).toHaveCount(10);
+    await expect(page.locator('section[data-stage="10"] pre code')).toContainText("Integrate the accepted test suite");
+    await expect(page.getByRole("button")).toHaveCount(0);
+    await page.getByRole("navigation", { name: "Tutorial stages" }).getByRole("link", { name: "7. Explore", exact: true }).click();
+    await expect(page.locator("#stage-7")).toBeInViewport();
+    await expect(page.getByRole("link", { name: "Markdown handout" })).toHaveAttribute("href", "playbook.md");
+  });
+});
+
+test("PAGE-12: headings and accessible stage labels are unique and ordered", async ({ page }) => {
+  await page.goto("/");
+  const ids = await page.locator("[id]").evaluateAll(elements => elements.map(element => element.id));
+  expect(ids.every(Boolean)).toBeTruthy();
+  expect(new Set(ids).size).toBe(ids.length);
+  const levels = await page.locator("h1, h2, h3, h4, h5, h6").evaluateAll(
+    headings => headings.map(heading => Number(heading.tagName.slice(1))),
+  );
+  expect(levels[0]).toBe(1);
+  for (let index = 1; index < levels.length; index++) {
+    expect(levels[index]).toBeLessThanOrEqual(levels[index - 1] + 1);
+  }
+  for (let stage = 1; stage <= 10; stage++) {
+    await expect(page.locator(`section[data-stage="${stage}"]`)).toHaveAccessibleName(new RegExp(`^Step ${stage}\\.`));
+  }
+});
+
+test("PAGE-13: every code sample has a uniquely named copy control and live feedback", async ({ page }) => {
+  await page.goto("/");
+  const samples = page.locator("pre code");
+  const buttons = page.getByRole("button", { name: /^Copy text block \d+$/ });
+  await expect(buttons).toHaveCount(await samples.count());
+  const controls = await page.locator("pre").evaluateAll(blocks => blocks.map(block => {
+    const tools = block.previousElementSibling;
+    return {
+      label: tools?.querySelector("button")?.getAttribute("aria-label"),
+      status: tools?.querySelector('[role="status"]') !== null,
+    };
+  }));
+  expect(controls.every(control => control.status && control.label)).toBeTruthy();
+  expect(new Set(controls.map(control => control.label)).size).toBe(controls.length);
+});
+
+test("PAGE-14: copy can recover after a transient clipboard failure", async ({ page }) => {
+  await page.addInitScript(() => {
+    let attempts = 0;
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: async () => {
+          if (attempts++ === 0) throw new DOMException("Temporary denial", "NotAllowedError");
+        },
+      },
+    });
+  });
+  await page.goto("/");
+  const section = page.locator('section[data-stage="1"]');
+  const button = section.getByRole("button");
+  const label = await button.getAttribute("aria-label");
+  expect(label).toMatch(/^Copy text block \d+$/);
+  await button.click();
+  await expect(section.getByRole("status")).toHaveText("Copy failed. Select and copy the text manually.");
+  await button.click();
+  await expect(section.getByRole("status")).toHaveText(label.replace(/^Copy/, "Copied") + ".");
+  await expect(button).toBeEnabled();
+});
+
+test("PAGE-15: every displayed code sample preserves the handout text", async ({ page }) => {
+  const source = (await readFile(new URL("../playbook.md", import.meta.url), "utf8")).replaceAll("\r\n", "\n");
+  const expected = [...source.matchAll(/^```[a-z]+\n([\s\S]*?)^```/gm)].map(match => match[1]);
+  expect(expected.length).toBeGreaterThanOrEqual(10);
+  await page.goto("/");
+  const actual = await page.locator("pre code").allTextContents();
+  expect(actual).toEqual(expected);
+});
+
+test("PAGE-16: customer-facing content replaces internal presentation notes", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("From legacy code to release confidence");
+  await expect(page.getByRole("heading", { name: "1. Build confidence before generating tests", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "11. Release-readiness checklist", exact: true })).toBeVisible();
+  const content = await page.getByRole("main").innerText();
+  for (const phrase of [
+    "Yes, an existing application", "Recommended presentation title", "Speaker note:",
+    "Suggested speaker lines", "Important wording for the presentation", "corrections to the initial approach",
+    "Demonstration plan for an audience", "What the audience should notice",
+  ]) {
+    expect(content).not.toContain(phrase);
+  }
+});
+
+test("PAGE-17: delivery and intentional-failure evidence are clearly separated", async ({ page }) => {
+  await page.goto("/#demo");
+  const passing = page.getByRole("link", { name: "View delivery runs", exact: true });
+  const failing = page.getByRole("link", { name: "View intentional failure demo", exact: true });
+  await expect(passing).toHaveAttribute("href", "https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/site.yml");
+  await expect(failing).toHaveAttribute("href", "https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/failure-demo.yml");
+  await expect(page.getByText("exactly one failed test", { exact: false })).toBeVisible();
+  await expect(page.getByText("It has no deployment permissions", { exact: false })).toBeVisible();
+  await expect(page.getByText("DEMO-01 first verifies", { exact: false })).toBeVisible();
+});
+
+test("PAGE-18: reference tables are keyboard-scrollable on narrow screens", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/#agenda");
+  const table = page.getByRole("region", { name: "Scrollable reference table", exact: true }).filter({
+    has: page.getByRole("columnheader", { name: "Session", exact: true }),
+  });
+  await table.focus();
+  await expect(table).toBeFocused();
+  expect(await table.evaluate(element => element.scrollWidth > element.clientWidth)).toBeTruthy();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => table.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });

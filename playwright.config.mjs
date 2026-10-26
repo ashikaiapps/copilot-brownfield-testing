@@ -9,7 +9,7 @@ export default defineConfig({
   failOnFlakyTests: Boolean(process.env.CI),
   workers: process.env.CI ? 2 : undefined,
   retries: process.env.CI ? 1 : 0,
-  reporter: [["list"], ["html", { open: "never" }]],
+  reporter: [["list"], ["html", { open: "never" }], ["json", { outputFile: "test-results/results.json" }]],
   use: {
     baseURL: process.env.BASE_URL || "http://127.0.0.1:4173",
     trace: "retain-on-failure",

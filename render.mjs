@@ -6,6 +6,7 @@ const chapters = [
   "skills", "delivery", "demo", "pitfalls", "done", "references",
 ];
 let stageOpen = false;
+let headline = "";
 const markdown = new Marked({
   renderer: {
     heading({ tokens, depth, text }) {
@@ -17,6 +18,11 @@ const markdown = new Marked({
         : chapter
           ? chapters[Number(chapter[1]) - 1]
           : text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (depth === 1) {
+        if (headline) throw new Error("The presentation must have exactly one main heading");
+        headline = `<h1 id="${id}">${title}</h1>`;
+        return "";
+      }
       let prefix = "";
       if (stageOpen && depth <= 3) {
         prefix = "</section>\n";
@@ -31,8 +37,12 @@ const markdown = new Marked({
   },
 });
 const source = await readFile(new URL("./playbook.md", import.meta.url), "utf8");
-const content = markdown.parse(source).replaceAll("<table>", '<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>').replaceAll("</table>", "</table></div>");
+const content = markdown.parse(source)
+  .replaceAll("<table>", '<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>')
+  .replaceAll("<th>", '<th scope="col">')
+  .replaceAll("</table>", "</table></div>");
 if (stageOpen) throw new Error("Unclosed tutorial stage");
+if (!headline) throw new Error("Missing presentation heading");
 const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -170,12 +180,14 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
       <a href="#tutorial">10 stages</a>
       <a href="#coverage">Coverage</a>
       <a href="#skills">Skills</a>
+      <a href="#demo">Demo &amp; CI</a>
       <a href="#references">References</a>
       <a href="playbook.md">Markdown handout</a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
     <p class="eyebrow">GitHub Copilot / Brownfield testing / Practical playbook</p>
+    ${headline}
     <p>Start with one business-critical journey. Prove the whole loop, then expand by risk.</p>
     <nav aria-label="Tutorial stages">
       <a href="#stage-1">1. Scope</a>
@@ -191,7 +203,7 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
     </nav>
 ${content}
   </main>
-  <footer>Static presentation, real delivery checks. Not a legacy business application. <a href="#main-content">Back to top</a></footer>
+  <footer>A practical GitHub Copilot testing playbook. <a href="#demo">Explore the delivery demonstration</a> or <a href="#main-content">back to top</a>.</footer>
   <script>
     document.querySelectorAll("pre").forEach((pre, index) => {
       const code = pre.querySelector("code");

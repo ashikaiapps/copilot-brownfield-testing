@@ -1,0 +1,41 @@
+name: Intentional failure demo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  intentional-failure:
+    name: DEMO-01 - expected failure (no deployment)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Demonstrate the regression gate (this step must fail)
+        run: npm run test:demo-failure
+      - name: Explain the intentional failure
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from "node:fs";
+          const { stats } = JSON.parse(readFileSync("test-results-demo/results.json", "utf8"));
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `## Intentional failure demonstration\nDEMO-01 changes the heading only inside its own test browser, then enforces the original expectation. This run should be red with exactly one failed test. The deployed page and standard delivery workflow are unaffected.\n\n| Passed | Failed | Flaky | Skipped |\n|---|---|---|---|\n| ${stats.expected} | ${stats.unexpected} | ${stats.flaky} | ${stats.skipped} |\n\nDownload intentional-failure-evidence for the HTML report, screenshot, and trace.\n`);
+          JS
+      - name: Preserve intentional failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: intentional-failure-evidence
+          path: |
+            playwright-report-demo/
+            test-results-demo/
+          retention-days: 7

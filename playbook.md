@@ -1,36 +1,32 @@
-# From brownfield application to a trusted automated test suite
+# From legacy code to release confidence
 
-## A practical GitHub Copilot playbook for agentic software engineering
+## Automated testing with GitHub Copilot for established applications
 
-**Format:** Static HTML presentation, tutorial, and copy-and-paste prompt library, with this complete Markdown handout.
+Build an evidence-backed testing strategy that protects critical business workflows and makes releases more predictable.
 
 **Audience:** Software engineers, quality engineers, technical leads, and application owners.
 
-**Scope:** This companion presentation site implements a small Playwright and GitHub Actions delivery example. The business-application files, tests, and pipelines described in the tutorial are proposed outputs, not completed work on a legacy application. No seventeen-year-old application has been inspected or modified for this presentation.
+**Workshop scope:** A practical ten-stage playbook with reusable prompts, review gates, and a working CI/CD reference. A fictional purchase-request journey illustrates the approach; the companion site demonstrates testing and deployment mechanics, not an assessment of your application.
 
-**Product documentation checked:** October 26, 2026. Verify capabilities in the Copilot client and version used for the presentation.
+**Updated:** October 26, 2026. Tool capabilities and customization support depend on your team's Copilot client and version.
 
 ---
 
-## 1. The presentation's central message
+## 1. Build confidence before generating tests
 
 > Before asking AI to write tests, ask it to build an evidence-backed understanding of the application, verify real user journeys, and establish what correct behavior means.
 
-Yes, an existing application is a **brownfield application**. A seventeen-year-old application is also a legacy system, but age alone does not determine its quality or testability.
+Business-critical applications carry years of business rules, integrations, and operational knowledge. A reliable regression suite protects that investment while enabling change.
 
 The challenge is not simply generating Playwright code. It is uncovering hidden business rules, preparing a repeatable environment, deciding what must be preserved, and producing tests that can be trusted to block a release.
 
-**Recommended presentation title**
+**The business challenge**
 
-**From legacy code to release confidence: automated testing with GitHub Copilot**
-
-**Opening scenario**
-
-> You inherit a seventeen-year-old business application. Documentation is incomplete, experienced developers hold essential knowledge, and the business still needs new features. How do you add automated testing without rewriting the application or accidentally preserving its bugs?
+> Your business relies on an established application. Documentation is incomplete, experienced developers hold essential knowledge, and new features must keep moving. How do you introduce automated testing without a rewrite or accidentally preserving defects?
 
 **Learning outcomes**
 
-By the end, participants should be able to:
+In this workshop, you will learn to:
 
 1. Use Copilot to create a navigable, evidence-backed application map.
 2. Translate business workflows into approved, testable user journeys.
@@ -47,13 +43,13 @@ This is agentic engineering because the agent works through a bounded cycle of *
 
 ---
 
-## 2. Three important corrections to the initial approach
+## 2. Three principles for trusted regression testing
 
 ### A. Inventory the whole repository; investigate it progressively
 
-The goal of comprehensive understanding is right. A single instruction to "read every file and remember everything" is not a reliable way to achieve it.
+Use a repository-wide inventory to establish scope, then investigate business-critical workflows in bounded, evidence-backed increments.
 
-Instead:
+For each discovery cycle:
 
 - Enumerate the repository's first-party components and relevant external boundaries.
 - Classify generated code, vendored dependencies, binaries, archived modules, and inaccessible areas.
@@ -64,7 +60,7 @@ Instead:
 
 An indexed function name is not evidence that its behavior has been understood. Reflection, runtime configuration, dependency injection, database procedures, plugins, and external repositories can hide relationships that static analysis misses.
 
-**Presentation phrase:** "Build a map of everything, then prove the paths that matter."
+**Build a map of the system, then prove the paths that matter.**
 
 ### B. Separate observed behavior from intended behavior
 
@@ -94,13 +90,13 @@ That is a useful, auditable target. "The application has 100% test coverage" is 
 
 ---
 
-## 3. Presentation structure: a 60-minute session
+## 3. Session agenda
 
-**Suggested allocation:** 40 minutes of teaching, 12 minutes of demonstration, 8 minutes of questions.
+**60 minutes:** 40 minutes of practical guidance, a 12-minute demonstration, and 8 minutes of discussion.
 
-| Slide | Topic | Time | Key message or visual |
+| Session | Topic | Time | Outcome |
 |---|---|---|---|
-| 1 | The seventeen-year-old application problem | 2 min | New features need a safety net, not a rewrite |
+| 1 | Protecting an established application | 2 min | New features need a safety net, not a rewrite |
 | 2 | What agentic engineering means here | 3 min | Plan, inspect, act, observe, correct; humans approve intent |
 | 3 | The complete workflow | 3 min | One pipeline from discovery to release evidence |
 | 4 | Build an application map, not a giant summary | 4 min | Repository inventory plus layered context |
@@ -115,13 +111,11 @@ That is a useful, auditable target. "The application has 100% test coverage" is 
 | 13 | Make the process repeatable with skills | 2 min | Instructions are policy; skills are procedures |
 | 14 | Closing checklist and questions | 9 min | Start with one important journey and expand |
 
-For a 30-minute version, combine slides 4-5 and 6-7, demonstrate one preprepared test, and move the full prompt library into the handout.
-
 ---
 
-## 4. Prerequisites and operating agreement
+## 4. Prepare a safe testing environment
 
-Before the tutorial, prepare:
+Start with clear authorization, repeatable environments, and agreed ownership:
 
 - An authorized clone or isolated working copy of the application at a recorded commit.
 - A Copilot agent-capable client with the required repository, terminal, and optional browser tools.
@@ -169,11 +163,11 @@ These guardrails complement technical controls; a prompt is not a security bound
 
 ---
 
-## 5. Tutorial steps and copy-and-paste prompts
+## 5. The ten-stage implementation playbook
 
 **How to use these prompts:** Replace bracketed values before pasting. Run one phase at a time. Each phase produces an artifact that the next phase consumes. The suggested Markdown filenames are tutorial conventions, not special Copilot features.
 
-Use one running example throughout the presentation: a fictional purchase-request application. An employee submits a request, a manager approves it, and an audit record is created.
+The running example is a fictional purchase-request application: an employee submits a request, a manager approves it, and an audit record is created.
 
 ### Step 1. Establish scope and produce a reconnaissance report
 
@@ -251,7 +245,7 @@ the next bounded discovery batch. Do not modify application behavior.
 
 **Review gate:** A developer can use the index to find the implementation and tests for a named capability.
 
-**Speaker note:** This is the answer to "Can the agent crawl the entire codebase?" It can inventory and investigate systematically, but completeness must be tracked rather than assumed.
+**Discovery standard:** Track inventory, traced behavior, and runtime verification separately. Completeness must be supported by evidence, not assumed from a repository scan.
 
 ### Step 3. Trace contracts and business rules end to end
 
@@ -486,7 +480,7 @@ Do not alter business expectations merely to obtain a passing test.
 
 **Review gate:** A reviewer can connect every important assertion to an approved outcome and reproduce the test.
 
-**Speaker note:** If the old UI needs stable test IDs, treat that as a small, explicit application change with normal review, not an excuse to rewrite components.
+**Implementation guidance:** Where stable test IDs are needed, introduce them as small, reviewed changes that preserve the existing user experience.
 
 ### Step 9. Challenge, stabilize, and expand the suite
 
@@ -573,11 +567,11 @@ and periodically audit the broader inventory for stale or missed areas.
 
 **Review gate:** The pipeline is exercised on an authorized change, failures propagate correctly, and report access is appropriate.
 
-**Important wording for the presentation:** CI responds to configured events. A local commit does not trigger hosted GitHub Actions until pushed. Say "every pushed commit and deployment covered by our policy," not "every local commit automatically."
+**Trigger policy:** CI responds to configured events. GitHub Actions checks pushed changes and deployments covered by your policy; a local commit alone does not trigger a hosted workflow.
 
 ---
 
-## 6. What the coverage report should actually say
+## 6. Measure coverage with release evidence
 
 Track coverage as a set of evidence-backed dimensions, not a single score.
 
@@ -615,9 +609,9 @@ For instrumented coverage, use tooling appropriate to each application runtime. 
 
 ---
 
-## 7. Context files, custom instructions, and skills
+## 7. Make the process repeatable with instructions and skills
 
-These solve different problems.
+Use each mechanism for a distinct responsibility: application knowledge, operating policy, repeatable procedures, or deterministic enforcement.
 
 | Mechanism | Purpose | Example |
 |---|---|---|
@@ -627,7 +621,7 @@ These solve different problems.
 | Agent skill | Reusable procedure activated for a relevant task | Discover and document a brownfield capability |
 | CI workflow | Deterministic execution and enforcement | Run committed tests and publish results |
 
-Suggested future repository layout:
+Example structure for your application:
 
 ```text
 .github\
@@ -654,11 +648,11 @@ docs\
       [component-specific documents]
 ```
 
-This layout is a proposal for the tutorial, not files created in an application by this presentation plan. Existing repository conventions should take precedence. Test locations should follow the application's established harness.
+Adapt this structure to your application's established conventions and test harness. The companion site's actual file layout is documented in its repository README.
 
 ### Example repository-wide instructions
 
-Proposed `.github\copilot-instructions.md`:
+Example file: `.github\copilot-instructions.md`.
 
 ```markdown
 # Repository working agreements
@@ -680,7 +674,7 @@ Keep the global file concise. Do not put the entire symbol inventory or test str
 
 ### Example path-specific instructions
 
-Proposed `.github\instructions\playwright.instructions.md`:
+Example file: `.github\instructions\playwright.instructions.md`.
 
 ```markdown
 ---
@@ -699,11 +693,11 @@ applyTo: "**/*.spec.ts,**/*.spec.js,**/playwright.config.*"
 - Never commit authentication state or sensitive test artifacts.
 ```
 
-Adjust the matching pattern to the actual test layout. Support for instruction types varies by Copilot surface and version; confirm it in the presenting client.
+Adjust the matching pattern to your test layout. Verify instruction support in your team's Copilot client and version.
 
 ### Example skill: brownfield test discovery
 
-Proposed `.github\skills\brownfield-test-discovery\SKILL.md`:
+Example file: `.github\skills\brownfield-test-discovery\SKILL.md`.
 
 ```markdown
 ---
@@ -747,7 +741,7 @@ and unresolved decisions. State exactly which areas remain unverified.
 
 ### Example skill: journey to Playwright
 
-Proposed `.github\skills\journey-to-playwright\SKILL.md`:
+Example file: `.github\skills\journey-to-playwright\SKILL.md`.
 
 ```markdown
 ---
@@ -796,7 +790,7 @@ Skills provide reusable instructions and resources. They do not automatically su
 
 ---
 
-## 8. CI/CD design to explain without turning the talk into a YAML tutorial
+## 8. CI/CD: turn test results into release decisions
 
 | Event | Typical checks | Environment and policy |
 |---|---|---|
@@ -814,50 +808,59 @@ Copilot can assist discovery, authoring, review, and failure triage. Exploratory
 
 ---
 
-## 9. Demonstration plan for an audience of more than one hundred people
+## 9. Demonstration: from approved intent to delivery evidence
 
-### Demo objective
+### Follow the evidence
 
-Show a traceable chain from a business requirement to an actual test result:
+Connect a business requirement to an observable outcome and an actual test result:
 
 ```text
 RULE-001 -> J-001-S01 -> observed UI -> test assertions -> CI result
 ```
 
-Use a synthetic example with no customer information.
+The purchase-request example uses synthetic data and contains no customer information.
 
-### Twelve-minute sequence
+### A twelve-minute walkthrough
 
-| Minute | Action | What the audience should notice |
+| Minute | Workflow | Evidence |
 |---|---|---|
-| 0-2 | Show the prepared application map and locate one capability in code | The map links to real implementation, not just README summaries |
-| 2-4 | Show the approved scenario, rule, and test oracle | Business intent is agreed before generation |
-| 4-5 | Have the browser-enabled agent execute the safe journey | Observed UI and state, not invented selectors |
-| 5-8 | Generate or complete one small Playwright test | Stable selectors, isolated data, meaningful outcome |
-| 8-10 | Run the test and show a preapproved controlled failure | A useful test catches the wrong outcome |
-| 10-12 | Show the trace/report and prepared CI evidence | Build, scenario ID, result, and remaining gaps are connected |
+| 0-2 | Locate one capability through the application map | Source-linked implementation, not just README summaries |
+| 2-4 | Review the approved scenario, rule, and test oracle | Business intent agreed before generation |
+| 4-5 | Execute the authorized journey with browser tools | Observed interface and state, not invented selectors |
+| 5-8 | Implement one focused Playwright test | Stable selectors, isolated data, meaningful outcome |
+| 8-10 | Run the test with an approved, controlled regression | A useful test catches the wrong outcome |
+| 10-12 | Inspect the trace, report, and CI result | Build, scenario ID, result, and remaining gaps connected |
 
-Prepare the broad repository inventory before the talk; do not spend the live demonstration waiting for a large crawl.
+### Explore the automated delivery demonstration
 
-Have a local recording, saved trace, and prepared test diff as fallback. Clearly label prerecorded evidence and live execution. Never describe a precomputed result as a live agent action.
+The companion repository runs **18 independent regression scenarios in two browser profiles: 36 checks**, followed by one hosted check against the deployed commit. These tests cover this presentation's content and interactions, not the fictional purchase-request backend.
 
-### Suggested speaker lines
+| Demonstration | What to inspect | Evidence |
+|---|---|---|
+| Standard delivery | Passing regression checks, test-gated Pages deployment, and hosted commit verification | [View delivery runs](https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/site.yml) |
+| Controlled regression | One intentionally failing test, DEMO-01, with expected/actual output, screenshot, and trace | [View intentional failure demo](https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/failure-demo.yml) |
+| Test implementation | Named scenarios and the exact assertion used in the demonstration | [Browse the tests](https://github.com/ashikaiapps/copilot-brownfield-testing/tree/main/tests) |
 
-**At the map:** "The agent does not need every source file in one prompt. It needs a reliable index and a method for following the evidence."
+**Expected failure, isolated from delivery:** DEMO-01 first verifies the correct page heading, then replaces it with "Release confidence unavailable" inside its own test browser. The unchanged assertion below fails because the required heading has regressed:
 
-**At the journey:** "A test is only as good as its definition of correct."
+```javascript
+await expect(page.getByRole("heading", { level: 1 }))
+  .toHaveText("From legacy code to release confidence");
+```
 
-**At generation:** "We are not asking for one hundred tests. We are asking for one trustworthy test that we can explain."
+The manual demo workflow is expected to finish red with **exactly one failed test**. Open the run to inspect the expected and actual heading, then download its report, screenshot, and trace. It has no deployment permissions and does not change the published page or weaken the normal release gate.
 
-**At the failure:** "A green test that cannot catch a meaningful regression is not a safety net."
+To reproduce the controlled failure locally:
 
-**At CI:** "AI helps build and maintain the test suite. The release gate runs reviewed, repeatable tests."
+```text
+npm run test:demo-failure
+```
 
-**Closing:** "Start with one business-critical journey. Prove the whole loop, then expand by risk."
+**The takeaway:** AI helps build and maintain the test suite. Release decisions rely on reviewed, repeatable tests that detect meaningful regressions.
 
 ---
 
-## 10. Common failure modes and the better instruction
+## 10. Common pitfalls and practical alternatives
 
 | Failure mode | Better approach |
 |---|---|
@@ -878,9 +881,9 @@ Have a local recording, saved trace, and prepared test diff as fallback. Clearly
 
 ---
 
-## 11. Definition of done for the tutorial
+## 11. Release-readiness checklist
 
-The exercise is complete when:
+A selected journey is ready for release gating when:
 
 1. The selected application scope is mapped with evidence and visible unknowns.
 2. Important contracts and business rules are traced and reviewed.
@@ -899,7 +902,7 @@ Do not claim completion for runtime checks that were blocked or not executed.
 
 ## 12. References and community resources
 
-Use these for the presentation's tooling claims. The workflow, prompts, artifact names, example scenario, and suggested gates above are recommendations, not built-in GitHub product workflows.
+Official documentation and community resources support the approach below. Adapt the example prompts, artifact names, and gates to your environment; they are not built-in GitHub product workflows.
 
 1. [GitHub Copilot agent skills](https://docs.github.com/en/copilot/concepts/customizations/agent-skills) - What skills are and supported Copilot surfaces; support depends on the client/version.
 2. [Adding agent skills for GitHub Copilot](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) - Skill directories, `SKILL.md`, required frontmatter, and trust considerations.
@@ -911,7 +914,7 @@ Use these for the presentation's tooling claims. The workflow, prompts, artifact
 
 ### Community reference: understanding an existing application
 
-[morluto/rea - Reverse Engineer Anything](https://github.com/morluto/rea) connects agents to tools for evidence-backed investigation of websites, JavaScript/Electron applications, .NET assemblies, and native binaries. It is a useful reference for the discovery and application-understanding portions of this presentation, particularly when source is incomplete or unavailable.
+[morluto/rea - Reverse Engineer Anything](https://github.com/morluto/rea) connects agents to tools for evidence-backed investigation of websites, JavaScript/Electron applications, .NET assemblies, and native binaries. It supports application discovery, particularly when source is incomplete or unavailable.
 
 Use only on applications and artifacts you are authorized to inspect. Ordinary source-code navigation remains the starting point when the source is available. REA is a third-party project, not a built-in GitHub Copilot feature, and its findings still require validation. No REA installation or execution is required for this tutorial.
 
@@ -937,13 +940,13 @@ Distinguish upstream guidance from project-specific decisions.
 Do not copy unnecessary tooling or claim the skill guarantees coverage.
 ```
 
-### The presentation as a small CI/CD demonstration
+### Companion implementation
 
 The companion repository is [ashikaiapps/copilot-brownfield-testing](https://github.com/ashikaiapps/copilot-brownfield-testing).
 
-Its implementation is deliberately small: a static HTML presentation, a Playwright test harness, and GitHub Actions that run the tests before deploying the approved main-branch artifact to GitHub Pages. Post-deployment smoke verification checks the hosted page and exact commit.
+Explore a working reference: a static HTML presentation, a Playwright test harness, and GitHub Actions that test each change before deploying the main-branch artifact to GitHub Pages. Post-deployment verification checks the hosted page and exact commit. A separate, manually triggered workflow demonstrates an intentional failure without affecting delivery.
 
-The page and its interactions are the application under test. This demonstrates the regression-testing and delivery mechanics; it is not a seventeen-year-old system, does not require a real backend, and does not claim to reproduce legacy-system complexity or complete application coverage.
+The presentation page is the application under test in this reference. It demonstrates regression-testing and delivery mechanics without a business backend; applying the approach to your application requires its own discovery, approved expectations, and coverage scope.
 
 **Final takeaway**
 

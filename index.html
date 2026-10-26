@@ -135,12 +135,14 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
       <a href="#tutorial">10 stages</a>
       <a href="#coverage">Coverage</a>
       <a href="#skills">Skills</a>
+      <a href="#demo">Demo &amp; CI</a>
       <a href="#references">References</a>
       <a href="playbook.md">Markdown handout</a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
     <p class="eyebrow">GitHub Copilot / Brownfield testing / Practical playbook</p>
+    <h1 id="from-legacy-code-to-release-confidence">From legacy code to release confidence</h1>
     <p>Start with one business-critical journey. Prove the whole loop, then expand by risk.</p>
     <nav aria-label="Tutorial stages">
       <a href="#stage-1">1. Scope</a>
@@ -154,27 +156,24 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
       <a href="#stage-9">9. Confidence</a>
       <a href="#stage-10">10. CI/CD</a>
     </nav>
-<h1 id="from-brownfield-application-to-a-trusted-automated-test-suite">From brownfield application to a trusted automated test suite</h1>
-<h2 id="a-practical-github-copilot-playbook-for-agentic-software-engineering">A practical GitHub Copilot playbook for agentic software engineering</h2>
-<p><strong>Format:</strong> Static HTML presentation, tutorial, and copy-and-paste prompt library, with this complete Markdown handout.</p>
+<h2 id="automated-testing-with-github-copilot-for-established-applications">Automated testing with GitHub Copilot for established applications</h2>
+<p>Build an evidence-backed testing strategy that protects critical business workflows and makes releases more predictable.</p>
 <p><strong>Audience:</strong> Software engineers, quality engineers, technical leads, and application owners.</p>
-<p><strong>Scope:</strong> This companion presentation site implements a small Playwright and GitHub Actions delivery example. The business-application files, tests, and pipelines described in the tutorial are proposed outputs, not completed work on a legacy application. No seventeen-year-old application has been inspected or modified for this presentation.</p>
-<p><strong>Product documentation checked:</strong> October 26, 2026. Verify capabilities in the Copilot client and version used for the presentation.</p>
+<p><strong>Workshop scope:</strong> A practical ten-stage playbook with reusable prompts, review gates, and a working CI/CD reference. A fictional purchase-request journey illustrates the approach; the companion site demonstrates testing and deployment mechanics, not an assessment of your application.</p>
+<p><strong>Updated:</strong> October 26, 2026. Tool capabilities and customization support depend on your team&#39;s Copilot client and version.</p>
 <hr>
-<h2 id="overview">1. The presentation&#39;s central message</h2>
+<h2 id="overview">1. Build confidence before generating tests</h2>
 <blockquote>
 <p>Before asking AI to write tests, ask it to build an evidence-backed understanding of the application, verify real user journeys, and establish what correct behavior means.</p>
 </blockquote>
-<p>Yes, an existing application is a <strong>brownfield application</strong>. A seventeen-year-old application is also a legacy system, but age alone does not determine its quality or testability.</p>
+<p>Business-critical applications carry years of business rules, integrations, and operational knowledge. A reliable regression suite protects that investment while enabling change.</p>
 <p>The challenge is not simply generating Playwright code. It is uncovering hidden business rules, preparing a repeatable environment, deciding what must be preserved, and producing tests that can be trusted to block a release.</p>
-<p><strong>Recommended presentation title</strong></p>
-<p><strong>From legacy code to release confidence: automated testing with GitHub Copilot</strong></p>
-<p><strong>Opening scenario</strong></p>
+<p><strong>The business challenge</strong></p>
 <blockquote>
-<p>You inherit a seventeen-year-old business application. Documentation is incomplete, experienced developers hold essential knowledge, and the business still needs new features. How do you add automated testing without rewriting the application or accidentally preserving its bugs?</p>
+<p>Your business relies on an established application. Documentation is incomplete, experienced developers hold essential knowledge, and new features must keep moving. How do you introduce automated testing without a rewrite or accidentally preserving defects?</p>
 </blockquote>
 <p><strong>Learning outcomes</strong></p>
-<p>By the end, participants should be able to:</p>
+<p>In this workshop, you will learn to:</p>
 <ol>
 <li>Use Copilot to create a navigable, evidence-backed application map.</li>
 <li>Translate business workflows into approved, testable user journeys.</li>
@@ -187,10 +186,10 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
 <p>Establish safe scope -&gt; Inventory and map the application -&gt; Trace contracts and business rules -&gt; Document and approve user journeys -&gt; Build a risk-based test portfolio -&gt; Prepare environment, accounts, and data -&gt; Explore the running application -&gt; Implement one verified vertical slice -&gt; Challenge and stabilize the tests -&gt; Run in CI/CD and maintain the evidence.</p>
 <p>This is agentic engineering because the agent works through a bounded cycle of <strong>plan, inspect, act, observe, and correct</strong>, using tools and persistent artifacts. Human owners still decide business intent, acceptable risk, and changes to expected behavior.</p>
 <hr>
-<h2 id="principles">2. Three important corrections to the initial approach</h2>
+<h2 id="principles">2. Three principles for trusted regression testing</h2>
 <h3 id="a-inventory-the-whole-repository-investigate-it-progressively">A. Inventory the whole repository; investigate it progressively</h3>
-<p>The goal of comprehensive understanding is right. A single instruction to &quot;read every file and remember everything&quot; is not a reliable way to achieve it.</p>
-<p>Instead:</p>
+<p>Use a repository-wide inventory to establish scope, then investigate business-critical workflows in bounded, evidence-backed increments.</p>
+<p>For each discovery cycle:</p>
 <ul>
 <li>Enumerate the repository&#39;s first-party components and relevant external boundaries.</li>
 <li>Classify generated code, vendored dependencies, binaries, archived modules, and inaccessible areas.</li>
@@ -200,15 +199,15 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
 <li>Record what was read, indexed, inferred, excluded, or blocked.</li>
 </ul>
 <p>An indexed function name is not evidence that its behavior has been understood. Reflection, runtime configuration, dependency injection, database procedures, plugins, and external repositories can hide relationships that static analysis misses.</p>
-<p><strong>Presentation phrase:</strong> &quot;Build a map of everything, then prove the paths that matter.&quot;</p>
+<p><strong>Build a map of the system, then prove the paths that matter.</strong></p>
 <h3 id="b-separate-observed-behavior-from-intended-behavior">B. Separate observed behavior from intended behavior</h3>
 <p>The code may contain bugs. Documentation may be outdated. A browser session may reveal only one role, configuration, or data state.</p>
 <p>For each important rule, distinguish:</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Evidence category</th>
-<th>Meaning</th>
+<th scope="col">Evidence category</th>
+<th scope="col">Meaning</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -241,20 +240,20 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
 </blockquote>
 <p>That is a useful, auditable target. &quot;The application has 100% test coverage&quot; is not, unless the metric, scope, and exclusions are stated.</p>
 <hr>
-<h2 id="agenda">3. Presentation structure: a 60-minute session</h2>
-<p><strong>Suggested allocation:</strong> 40 minutes of teaching, 12 minutes of demonstration, 8 minutes of questions.</p>
+<h2 id="agenda">3. Session agenda</h2>
+<p><strong>60 minutes:</strong> 40 minutes of practical guidance, a 12-minute demonstration, and 8 minutes of discussion.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Slide</th>
-<th>Topic</th>
-<th>Time</th>
-<th>Key message or visual</th>
+<th scope="col">Session</th>
+<th scope="col">Topic</th>
+<th scope="col">Time</th>
+<th scope="col">Outcome</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>1</td>
-<td>The seventeen-year-old application problem</td>
+<td>Protecting an established application</td>
 <td>2 min</td>
 <td>New features need a safety net, not a rewrite</td>
 </tr>
@@ -337,10 +336,9 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
 <td>Start with one important journey and expand</td>
 </tr>
 </tbody></table></div>
-<p>For a 30-minute version, combine slides 4-5 and 6-7, demonstrate one preprepared test, and move the full prompt library into the handout.</p>
 <hr>
-<h2 id="guardrails">4. Prerequisites and operating agreement</h2>
-<p>Before the tutorial, prepare:</p>
+<h2 id="guardrails">4. Prepare a safe testing environment</h2>
+<p>Start with clear authorization, repeatable environments, and agreed ownership:</p>
 <ul>
 <li>An authorized clone or isolated working copy of the application at a recorded commit.</li>
 <li>A Copilot agent-capable client with the required repository, terminal, and optional browser tools.</li>
@@ -380,9 +378,9 @@ Keep an explicit record of exclusions, uncertainty, and blockers.
 </code></pre>
 <p>These guardrails complement technical controls; a prompt is not a security boundary.</p>
 <hr>
-<h2 id="tutorial">5. Tutorial steps and copy-and-paste prompts</h2>
+<h2 id="tutorial">5. The ten-stage implementation playbook</h2>
 <p><strong>How to use these prompts:</strong> Replace bracketed values before pasting. Run one phase at a time. Each phase produces an artifact that the next phase consumes. The suggested Markdown filenames are tutorial conventions, not special Copilot features.</p>
-<p>Use one running example throughout the presentation: a fictional purchase-request application. An employee submits a request, a manager approves it, and an audit record is created.</p>
+<p>The running example is a fictional purchase-request application: an employee submits a request, a manager approves it, and an audit record is created.</p>
 <section data-stage="1" aria-labelledby="stage-1">
 <h3 id="stage-1">Step 1. Establish scope and produce a reconnaissance report</h3>
 <p><strong>Intent:</strong> Understand what is present and what can be safely inspected before trying to run anything.</p>
@@ -448,7 +446,7 @@ Deeply trace [FIRST_PRIORITY_COMPONENT_OR_JOURNEY] first, then propose
 the next bounded discovery batch. Do not modify application behavior.
 </code></pre>
 <p><strong>Review gate:</strong> A developer can use the index to find the implementation and tests for a named capability.</p>
-<p><strong>Speaker note:</strong> This is the answer to &quot;Can the agent crawl the entire codebase?&quot; It can inventory and investigate systematically, but completeness must be tracked rather than assumed.</p>
+<p><strong>Discovery standard:</strong> Track inventory, traced behavior, and runtime verification separately. Completeness must be supported by evidence, not assumed from a repository scan.</p>
 </section>
 <section data-stage="3" aria-labelledby="stage-3">
 <h3 id="stage-3">Step 3. Trace contracts and business rules end to end</h3>
@@ -513,8 +511,8 @@ Do not generate tests for disputed expectations.
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Illustrative value; requires owner approval</th>
+<th scope="col">Field</th>
+<th scope="col">Illustrative value; requires owner approval</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -679,7 +677,7 @@ Report actual results and blockers. Update the matrix accurately.
 Do not alter business expectations merely to obtain a passing test.
 </code></pre>
 <p><strong>Review gate:</strong> A reviewer can connect every important assertion to an approved outcome and reproduce the test.</p>
-<p><strong>Speaker note:</strong> If the old UI needs stable test IDs, treat that as a small, explicit application change with normal review, not an excuse to rewrite components.</p>
+<p><strong>Implementation guidance:</strong> Where stable test IDs are needed, introduce them as small, reviewed changes that preserve the existing user experience.</p>
 </section>
 <section data-stage="9" aria-labelledby="stage-9">
 <h3 id="stage-9">Step 9. Challenge, stabilize, and expand the suite</h3>
@@ -755,17 +753,17 @@ coverage rows together. Refresh affected context documents on changes
 and periodically audit the broader inventory for stale or missed areas.
 </code></pre>
 <p><strong>Review gate:</strong> The pipeline is exercised on an authorized change, failures propagate correctly, and report access is appropriate.</p>
-<p><strong>Important wording for the presentation:</strong> CI responds to configured events. A local commit does not trigger hosted GitHub Actions until pushed. Say &quot;every pushed commit and deployment covered by our policy,&quot; not &quot;every local commit automatically.&quot;</p>
+<p><strong>Trigger policy:</strong> CI responds to configured events. GitHub Actions checks pushed changes and deployments covered by your policy; a local commit alone does not trigger a hosted workflow.</p>
 <hr>
 </section>
-<h2 id="coverage">6. What the coverage report should actually say</h2>
+<h2 id="coverage">6. Measure coverage with release evidence</h2>
 <p>Track coverage as a set of evidence-backed dimensions, not a single score.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Dimension</th>
-<th>Example metric</th>
-<th>What it does not prove</th>
+<th scope="col">Dimension</th>
+<th scope="col">Example metric</th>
+<th scope="col">What it does not prove</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -822,14 +820,14 @@ This is not 100% application coverage.
 <p>Add browser, role, feature-flag, and environment dimensions explicitly when they are part of the acceptance scope. Keep exclusions visible. Avoid silently counting a skipped or retry-recovered test as equivalent to a clean first-attempt pass.</p>
 <p>For instrumented coverage, use tooling appropriate to each application runtime. Playwright&#39;s browser coverage facilities are not a universal measurement system for all backend languages or supported browsers.</p>
 <hr>
-<h2 id="skills">7. Context files, custom instructions, and skills</h2>
-<p>These solve different problems.</p>
+<h2 id="skills">7. Make the process repeatable with instructions and skills</h2>
+<p>Use each mechanism for a distinct responsibility: application knowledge, operating policy, repeatable procedures, or deterministic enforcement.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Mechanism</th>
-<th>Purpose</th>
-<th>Example</th>
+<th scope="col">Mechanism</th>
+<th scope="col">Purpose</th>
+<th scope="col">Example</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -858,7 +856,7 @@ This is not 100% application coverage.
 <td>Run committed tests and publish results</td>
 </tr>
 </tbody></table></div>
-<p>Suggested future repository layout:</p>
+<p>Example structure for your application:</p>
 <pre><code class="language-text">.github\
   copilot-instructions.md
   instructions\
@@ -882,9 +880,9 @@ docs\
     components\
       [component-specific documents]
 </code></pre>
-<p>This layout is a proposal for the tutorial, not files created in an application by this presentation plan. Existing repository conventions should take precedence. Test locations should follow the application&#39;s established harness.</p>
+<p>Adapt this structure to your application&#39;s established conventions and test harness. The companion site&#39;s actual file layout is documented in its repository README.</p>
 <h3 id="example-repository-wide-instructions">Example repository-wide instructions</h3>
-<p>Proposed <code>.github\copilot-instructions.md</code>:</p>
+<p>Example file: <code>.github\copilot-instructions.md</code>.</p>
 <pre><code class="language-markdown"># Repository working agreements
 
 - Start with docs/testing/01-application-map.md for application navigation.
@@ -901,7 +899,7 @@ docs\
 </code></pre>
 <p>Keep the global file concise. Do not put the entire symbol inventory or test strategy into automatically loaded instructions.</p>
 <h3 id="example-path-specific-instructions">Example path-specific instructions</h3>
-<p>Proposed <code>.github\instructions\playwright.instructions.md</code>:</p>
+<p>Example file: <code>.github\instructions\playwright.instructions.md</code>.</p>
 <pre><code class="language-markdown">---
 applyTo: &quot;**/*.spec.ts,**/*.spec.js,**/playwright.config.*&quot;
 ---
@@ -917,9 +915,9 @@ applyTo: &quot;**/*.spec.ts,**/*.spec.js,**/playwright.config.*&quot;
 - Follow the environment runbook for authentication and cleanup.
 - Never commit authentication state or sensitive test artifacts.
 </code></pre>
-<p>Adjust the matching pattern to the actual test layout. Support for instruction types varies by Copilot surface and version; confirm it in the presenting client.</p>
+<p>Adjust the matching pattern to your test layout. Verify instruction support in your team&#39;s Copilot client and version.</p>
 <h3 id="example-skill-brownfield-test-discovery">Example skill: brownfield test discovery</h3>
-<p>Proposed <code>.github\skills\brownfield-test-discovery\SKILL.md</code>:</p>
+<p>Example file: <code>.github\skills\brownfield-test-discovery\SKILL.md</code>.</p>
 <pre><code class="language-markdown">---
 name: brownfield-test-discovery
 description: Map an existing application and produce evidence-backed contracts, user journeys, and a risk-based test plan. Use when assessing regression testing for a brownfield application.
@@ -959,7 +957,7 @@ Provide a navigable map, traced contracts, draft journeys, test matrix,
 and unresolved decisions. State exactly which areas remain unverified.
 </code></pre>
 <h3 id="example-skill-journey-to-playwright">Example skill: journey to Playwright</h3>
-<p>Proposed <code>.github\skills\journey-to-playwright\SKILL.md</code>:</p>
+<p>Example file: <code>.github\skills\journey-to-playwright\SKILL.md</code>.</p>
 <pre><code class="language-markdown">---
 name: journey-to-playwright
 description: Turn an approved user-journey scenario into an isolated Playwright test using verified browser evidence. Use when implementing or updating browser regression tests.
@@ -1000,13 +998,13 @@ Produce discovery artifacts only; do not implement tests yet.
 </code></pre>
 <p>Skills provide reusable instructions and resources. They do not automatically supply credentials, browser access, missing tools, exhaustive understanding, or permission to execute arbitrary scripts. Review third-party skills before installation.</p>
 <hr>
-<h2 id="delivery">8. CI/CD design to explain without turning the talk into a YAML tutorial</h2>
+<h2 id="delivery">8. CI/CD: turn test results into release decisions</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Event</th>
-<th>Typical checks</th>
-<th>Environment and policy</th>
+<th scope="col">Event</th>
+<th scope="col">Typical checks</th>
+<th scope="col">Environment and policy</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -1039,68 +1037,94 @@ Produce discovery artifacts only; do not implement tests yet.
 <p><strong>What runs in normal regression CI?</strong> The committed Playwright tests and application/test tooling. An LLM does not need to improvise a new browser journey on every run.</p>
 <p>Copilot can assist discovery, authoring, review, and failure triage. Exploratory agent runs should be distinguishable from deterministic release-gating tests. Do not let an unattended agent rewrite expected results or auto-heal assertions in the release gate.</p>
 <hr>
-<h2 id="demo">9. Demonstration plan for an audience of more than one hundred people</h2>
-<h3 id="demo-objective">Demo objective</h3>
-<p>Show a traceable chain from a business requirement to an actual test result:</p>
+<h2 id="demo">9. Demonstration: from approved intent to delivery evidence</h2>
+<h3 id="follow-the-evidence">Follow the evidence</h3>
+<p>Connect a business requirement to an observable outcome and an actual test result:</p>
 <pre><code class="language-text">RULE-001 -&gt; J-001-S01 -&gt; observed UI -&gt; test assertions -&gt; CI result
 </code></pre>
-<p>Use a synthetic example with no customer information.</p>
-<h3 id="twelve-minute-sequence">Twelve-minute sequence</h3>
+<p>The purchase-request example uses synthetic data and contains no customer information.</p>
+<h3 id="a-twelve-minute-walkthrough">A twelve-minute walkthrough</h3>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Minute</th>
-<th>Action</th>
-<th>What the audience should notice</th>
+<th scope="col">Minute</th>
+<th scope="col">Workflow</th>
+<th scope="col">Evidence</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>0-2</td>
-<td>Show the prepared application map and locate one capability in code</td>
-<td>The map links to real implementation, not just README summaries</td>
+<td>Locate one capability through the application map</td>
+<td>Source-linked implementation, not just README summaries</td>
 </tr>
 <tr>
 <td>2-4</td>
-<td>Show the approved scenario, rule, and test oracle</td>
-<td>Business intent is agreed before generation</td>
+<td>Review the approved scenario, rule, and test oracle</td>
+<td>Business intent agreed before generation</td>
 </tr>
 <tr>
 <td>4-5</td>
-<td>Have the browser-enabled agent execute the safe journey</td>
-<td>Observed UI and state, not invented selectors</td>
+<td>Execute the authorized journey with browser tools</td>
+<td>Observed interface and state, not invented selectors</td>
 </tr>
 <tr>
 <td>5-8</td>
-<td>Generate or complete one small Playwright test</td>
+<td>Implement one focused Playwright test</td>
 <td>Stable selectors, isolated data, meaningful outcome</td>
 </tr>
 <tr>
 <td>8-10</td>
-<td>Run the test and show a preapproved controlled failure</td>
+<td>Run the test with an approved, controlled regression</td>
 <td>A useful test catches the wrong outcome</td>
 </tr>
 <tr>
 <td>10-12</td>
-<td>Show the trace/report and prepared CI evidence</td>
-<td>Build, scenario ID, result, and remaining gaps are connected</td>
+<td>Inspect the trace, report, and CI result</td>
+<td>Build, scenario ID, result, and remaining gaps connected</td>
 </tr>
 </tbody></table></div>
-<p>Prepare the broad repository inventory before the talk; do not spend the live demonstration waiting for a large crawl.</p>
-<p>Have a local recording, saved trace, and prepared test diff as fallback. Clearly label prerecorded evidence and live execution. Never describe a precomputed result as a live agent action.</p>
-<h3 id="suggested-speaker-lines">Suggested speaker lines</h3>
-<p><strong>At the map:</strong> &quot;The agent does not need every source file in one prompt. It needs a reliable index and a method for following the evidence.&quot;</p>
-<p><strong>At the journey:</strong> &quot;A test is only as good as its definition of correct.&quot;</p>
-<p><strong>At generation:</strong> &quot;We are not asking for one hundred tests. We are asking for one trustworthy test that we can explain.&quot;</p>
-<p><strong>At the failure:</strong> &quot;A green test that cannot catch a meaningful regression is not a safety net.&quot;</p>
-<p><strong>At CI:</strong> &quot;AI helps build and maintain the test suite. The release gate runs reviewed, repeatable tests.&quot;</p>
-<p><strong>Closing:</strong> &quot;Start with one business-critical journey. Prove the whole loop, then expand by risk.&quot;</p>
-<hr>
-<h2 id="pitfalls">10. Common failure modes and the better instruction</h2>
+<h3 id="explore-the-automated-delivery-demonstration">Explore the automated delivery demonstration</h3>
+<p>The companion repository runs <strong>18 independent regression scenarios in two browser profiles: 36 checks</strong>, followed by one hosted check against the deployed commit. These tests cover this presentation&#39;s content and interactions, not the fictional purchase-request backend.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
-<th>Failure mode</th>
-<th>Better approach</th>
+<th scope="col">Demonstration</th>
+<th scope="col">What to inspect</th>
+<th scope="col">Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Standard delivery</td>
+<td>Passing regression checks, test-gated Pages deployment, and hosted commit verification</td>
+<td><a href="https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/site.yml">View delivery runs</a></td>
+</tr>
+<tr>
+<td>Controlled regression</td>
+<td>One intentionally failing test, DEMO-01, with expected/actual output, screenshot, and trace</td>
+<td><a href="https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/failure-demo.yml">View intentional failure demo</a></td>
+</tr>
+<tr>
+<td>Test implementation</td>
+<td>Named scenarios and the exact assertion used in the demonstration</td>
+<td><a href="https://github.com/ashikaiapps/copilot-brownfield-testing/tree/main/tests">Browse the tests</a></td>
+</tr>
+</tbody></table></div>
+<p><strong>Expected failure, isolated from delivery:</strong> DEMO-01 first verifies the correct page heading, then replaces it with &quot;Release confidence unavailable&quot; inside its own test browser. The unchanged assertion below fails because the required heading has regressed:</p>
+<pre><code class="language-javascript">await expect(page.getByRole(&quot;heading&quot;, { level: 1 }))
+  .toHaveText(&quot;From legacy code to release confidence&quot;);
+</code></pre>
+<p>The manual demo workflow is expected to finish red with <strong>exactly one failed test</strong>. Open the run to inspect the expected and actual heading, then download its report, screenshot, and trace. It has no deployment permissions and does not change the published page or weaken the normal release gate.</p>
+<p>To reproduce the controlled failure locally:</p>
+<pre><code class="language-text">npm run test:demo-failure
+</code></pre>
+<p><strong>The takeaway:</strong> AI helps build and maintain the test suite. Release decisions rely on reviewed, repeatable tests that detect meaningful regressions.</p>
+<hr>
+<h2 id="pitfalls">10. Common pitfalls and practical alternatives</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
+<thead>
+<tr>
+<th scope="col">Failure mode</th>
+<th scope="col">Better approach</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -1161,8 +1185,8 @@ Produce discovery artifacts only; do not implement tests yet.
 </tr>
 </tbody></table></div>
 <hr>
-<h2 id="done">11. Definition of done for the tutorial</h2>
-<p>The exercise is complete when:</p>
+<h2 id="done">11. Release-readiness checklist</h2>
+<p>A selected journey is ready for release gating when:</p>
 <ol>
 <li>The selected application scope is mapped with evidence and visible unknowns.</li>
 <li>Important contracts and business rules are traced and reviewed.</li>
@@ -1178,7 +1202,7 @@ Produce discovery artifacts only; do not implement tests yet.
 <p>Do not claim completion for runtime checks that were blocked or not executed.</p>
 <hr>
 <h2 id="references">12. References and community resources</h2>
-<p>Use these for the presentation&#39;s tooling claims. The workflow, prompts, artifact names, example scenario, and suggested gates above are recommendations, not built-in GitHub product workflows.</p>
+<p>Official documentation and community resources support the approach below. Adapt the example prompts, artifact names, and gates to your environment; they are not built-in GitHub product workflows.</p>
 <ol>
 <li><a href="https://docs.github.com/en/copilot/concepts/customizations/agent-skills">GitHub Copilot agent skills</a> - What skills are and supported Copilot surfaces; support depends on the client/version.</li>
 <li><a href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills">Adding agent skills for GitHub Copilot</a> - Skill directories, <code>SKILL.md</code>, required frontmatter, and trust considerations.</li>
@@ -1189,7 +1213,7 @@ Produce discovery artifacts only; do not implement tests yet.
 <li><a href="https://playwright.dev/docs/ci-intro">Playwright CI setup</a> - CI execution, HTML reports, and trace inspection.</li>
 </ol>
 <h3 id="community-reference-understanding-an-existing-application">Community reference: understanding an existing application</h3>
-<p><a href="https://github.com/morluto/rea">morluto/rea - Reverse Engineer Anything</a> connects agents to tools for evidence-backed investigation of websites, JavaScript/Electron applications, .NET assemblies, and native binaries. It is a useful reference for the discovery and application-understanding portions of this presentation, particularly when source is incomplete or unavailable.</p>
+<p><a href="https://github.com/morluto/rea">morluto/rea - Reverse Engineer Anything</a> connects agents to tools for evidence-backed investigation of websites, JavaScript/Electron applications, .NET assemblies, and native binaries. It supports application discovery, particularly when source is incomplete or unavailable.</p>
 <p>Use only on applications and artifacts you are authorized to inspect. Ordinary source-code navigation remains the starting point when the source is available. REA is a third-party project, not a built-in GitHub Copilot feature, and its findings still require validation. No REA installation or execution is required for this tutorial.</p>
 <h3 id="community-resource-qa-skills-and-prompts">Community resource: QA skills and prompts</h3>
 <p><a href="https://github.com/petrkindlmann/qa-skills">petrkindlmann/qa-skills - QA Skills for AI Agents</a> provides reusable QA workflows, examples, and skills. Relevant starting points include <code>qa-project-context</code>, <code>test-strategy</code>, <code>risk-based-testing</code>, <code>playwright-automation</code>, <code>agentic-browser-testing</code>, <code>test-data-management</code>, <code>test-reliability</code>, <code>coverage-analysis</code>, and <code>ci-cd-integration</code>.</p>
@@ -1207,17 +1231,17 @@ human approval gates, and existing testing conventions.
 Distinguish upstream guidance from project-specific decisions.
 Do not copy unnecessary tooling or claim the skill guarantees coverage.
 </code></pre>
-<h3 id="the-presentation-as-a-small-ci-cd-demonstration">The presentation as a small CI/CD demonstration</h3>
+<h3 id="companion-implementation">Companion implementation</h3>
 <p>The companion repository is <a href="https://github.com/ashikaiapps/copilot-brownfield-testing">ashikaiapps/copilot-brownfield-testing</a>.</p>
-<p>Its implementation is deliberately small: a static HTML presentation, a Playwright test harness, and GitHub Actions that run the tests before deploying the approved main-branch artifact to GitHub Pages. Post-deployment smoke verification checks the hosted page and exact commit.</p>
-<p>The page and its interactions are the application under test. This demonstrates the regression-testing and delivery mechanics; it is not a seventeen-year-old system, does not require a real backend, and does not claim to reproduce legacy-system complexity or complete application coverage.</p>
+<p>Explore a working reference: a static HTML presentation, a Playwright test harness, and GitHub Actions that test each change before deploying the main-branch artifact to GitHub Pages. Post-deployment verification checks the hosted page and exact commit. A separate, manually triggered workflow demonstrates an intentional failure without affecting delivery.</p>
+<p>The presentation page is the application under test in this reference. It demonstrates regression-testing and delivery mechanics without a business backend; applying the approach to your application requires its own discovery, approved expectations, and coverage scope.</p>
 <p><strong>Final takeaway</strong></p>
 <blockquote>
 <p>The deliverable is not a pile of AI-generated tests. It is a maintained chain of evidence from business intent to application behavior to automated release confidence.</p>
 </blockquote>
 
   </main>
-  <footer>Static presentation, real delivery checks. Not a legacy business application. <a href="#main-content">Back to top</a></footer>
+  <footer>A practical GitHub Copilot testing playbook. <a href="#demo">Explore the delivery demonstration</a> or <a href="#main-content">back to top</a>.</footer>
   <script>
     document.querySelectorAll("pre").forEach((pre, index) => {
       const code = pre.querySelector("code");

@@ -7,7 +7,8 @@
     "render": "node render.mjs",
     "start": "node server.mjs",
     "test": "playwright test",
-    "test:hosted": "playwright test --project=hosted"
+    "test:hosted": "playwright test --project=hosted",
+    "test:demo-failure": "playwright test --config=playwright.demo.config.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
