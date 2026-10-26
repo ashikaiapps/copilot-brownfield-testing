@@ -57,7 +57,7 @@ To edit content, update `playbook.md`, run `npm run render`, and commit both the
 
 ## Executable scenarios
 
-Twenty-three scenarios run in the desktop and mobile projects (Chromium and mobile emulation): **46 checks per local/CI run**. PAGE-09 through PAGE-18 are the ten expanded interaction scenarios; PAGE-19 and PAGE-20 check tool-selection and Azure guidance. PAGE-21 and PAGE-23 are file/packaging contracts, not browser user journeys; PAGE-22 exercises the real download. A separate post-deployment check brings the main-branch delivery workflow total to **47**. Actual passed, failed, flaky, and skipped counts appear in the Actions job summary and downloadable report.
+Twenty-four scenarios run in the desktop and mobile projects (Chromium and mobile emulation): **48 checks per local/CI run**. PAGE-09 through PAGE-18 are the ten expanded interaction scenarios; PAGE-19 and PAGE-20 check tool-selection and Azure guidance. PAGE-21 and PAGE-23 are file/packaging contracts, not browser user journeys; PAGE-22 exercises the real pointer download and PAGE-24 exercises keyboard Enter activation. A separate post-deployment check brings the main-branch delivery workflow total to **49**. Actual passed, failed, flaky, and skipped counts appear in the Actions job summary and downloadable report.
 
 | ID | Approved observable outcome |
 |---|---|
@@ -82,9 +82,12 @@ Twenty-three scenarios run in the desktop and mobile projects (Chromium and mobi
 | PAGE-19 | Tool selection distinguishes runners/drivers/assertions and coverage instrumentation, preserves reviewed documentation links, and offers an approval-gated prompt |
 | PAGE-20 | Azure guidance distinguishes Playwright Workspaces from JMeter/Locust load testing, preserves official links, and documents cost/approval/no-public-stress boundaries |
 | PAGE-21 | Canonical profile has valid minimal frontmatter, a meaningful description, fewer than 30,000 characters, approved workflow/safety content, exact SHA-256 and LF UTF-8 bytes |
-| PAGE-22 | Agent navigation, installation/starter guidance and explicit-read fallback are visible on mobile; HTTP response and actual browser download match canonical bytes and filename; hidden source URL is not served |
+| PAGE-22 | Agent navigation, installation/starter guidance and explicit-read fallback are visible on mobile; pointer activation downloads the correct filename and canonical bytes with valid metadata/version/safety content, not HTML/404; hidden source URL is not served |
 | PAGE-23 | Packaging publishes only the exact allowlist, preserves source bytes/revision, refuses stale staging, and fails explicitly if the canonical agent is missing |
-| HOST-01 | Hosted page preserves the tutorial/guidance; live agent response equals canonical bytes/SHA-256; `version.json` identifies the exact deployed commit |
+| PAGE-24 | Focused download link responds to Enter with a successful real browser download, validated canonical profile bytes, and no navigation away from the presentation |
+| HOST-01 | Hosted page preserves the tutorial/guidance; live HTTP response and actual browser download equal the canonical profile; SHA-256 and `version.json` identify the intended artifact and deployed commit |
+
+Pointer, keyboard, and hosted downloads share `tests/agent-download.mjs`: register the download wait before activation, assert filename/no failure, save to a test-isolated output path, and inspect the actual bytes. Exact LF UTF-8 equality is intentional; line-ending changes are delivery changes, not silently normalized successes. Tests only read the profile and never execute its instructions.
 
 PAGE-05 and the keyboard activation part of PAGE-06 simulate clipboard denial. PAGE-14 uses a controlled clipboard adapter that rejects once and resolves once to test feedback recovery; it does not claim to exercise the OS clipboard. PAGE-04 uses real clipboard read/write, not a success stub. Real clipboard tests use the same immutable prompt; no tests share server-side mutable data. Browser storage is isolated per test.
 
@@ -92,7 +95,7 @@ These checks do **not** demonstrate exhaustive accessibility, Firefox/WebKit or 
 
 ## CI/CD behavior
 
-- Every pushed branch commit and pull-request update runs the 46 checks and source/HTML consistency check. A local commit alone does not trigger GitHub Actions.
+- Every pushed branch commit and pull-request update runs the 48 checks and source/HTML consistency check. A local commit alone does not trigger GitHub Actions.
 - Only `main` pushes (or a manual run on `main`) can deploy, and only after the test job passes. Pull requests use read-only permissions and never deploy; there is no privileged `pull_request_target` execution.
 - The deployment job alone receives `pages: write` and `id-token: write`. Official Pages actions publish **only** `index.html`, `playbook.md`, generated `version.json`, and `downloads/brownfield-testing.agent.md`, copied from the canonical profile. The `.github` directory, dependencies, reports, and traces are never placed in the public site.
 - The hosted-smoke job waits for successful deployment, uses its actual URL, compares the hosted revision to `github.sha`, and verifies the live download byte-for-byte against the checked-out canonical profile; it cannot silently fall back to localhost. Runs for the same branch are serialized across testing, deployment, and smoke to avoid overlapping deployments.

@@ -833,7 +833,7 @@ The purchase-request example uses synthetic data and contains no customer inform
 
 ### Explore the automated delivery demonstration
 
-The companion repository runs **23 independent scenarios in desktop and mobile projects: 46 checks**, including agent-profile and packaging contracts, followed by one hosted check against the deployed commit. These tests cover this presentation, its downloads, and delivery mechanics, not the fictional purchase-request backend.
+The companion repository runs **24 independent scenarios in desktop and mobile projects: 48 checks**, including agent-profile and packaging contracts, followed by one hosted check against the deployed commit. These tests cover this presentation, its downloads, and delivery mechanics, not the fictional purchase-request backend.
 
 | Demonstration | What to inspect | Evidence |
 |---|---|---|

@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { verifyAgentDownload } from "./agent-download.mjs";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
-test("HOST-01: deployed content and revision match the tested commit", async ({ page, request }) => {
+test("HOST-01: deployed content and revision match the tested commit", async ({ page, request }, testInfo) => {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   const response = await page.goto("./");
@@ -25,6 +26,7 @@ test("HOST-01: deployed content and revision match the tested commit", async ({ 
   expect(bytes).toEqual(await readFile(new URL("../.github/agents/brownfield-testing.agent.md", import.meta.url)));
   expect(createHash("sha256").update(bytes).digest("hex"))
     .toBe("6dad9f89feef256594fbee12d5c243df7fa18a42f5aae36878f14725bfe4dbae");
+  await verifyAgentDownload(page, testInfo, () => downloadLink.click());
   const version = await request.get("version.json");
   expect(version.ok()).toBeTruthy();
   expect(process.env.EXPECTED_SHA, "Hosted checks require EXPECTED_SHA").toBeTruthy();

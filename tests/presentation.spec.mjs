@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { verifyAgentDownload } from "./agent-download.mjs";
 import { copyFile, mkdir, readFile, readdir, unlink } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
@@ -401,14 +402,7 @@ test("PAGE-22: agent navigation, safe installation guidance, and real download p
   expect(response.headers()["content-type"]).toContain("text/markdown");
   expect(await response.body()).toEqual(canonical);
   expect((await request.get(".github/agents/brownfield-testing.agent.md")).status()).toBe(404);
-  const downloading = page.waitForEvent("download");
-  await link.click();
-  const download = await downloading;
-  expect(download.suggestedFilename()).toBe("brownfield-testing.agent.md");
-  expect(await download.failure()).toBeNull();
-  const saved = testInfo.outputPath("brownfield-testing.agent.md");
-  await download.saveAs(saved);
-  expect(await readFile(saved)).toEqual(canonical);
+  await verifyAgentDownload(page, testInfo, () => link.click());
   await page.setViewportSize({ width: 320, height: 800 });
   await expect(link).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
@@ -447,4 +441,14 @@ test("PAGE-23: packaging allowlists exact public files and fails on missing cano
   expect(missing.status).not.toBe(0);
   expect(missing.stderr).toContain("ENOENT");
   expect(missing.stderr).toContain("brownfield-testing.agent.md");
+});
+
+test("PAGE-24: keyboard Enter downloads the canonical agent without leaving the presentation", async ({ page }, testInfo) => {
+  await page.goto("/#agent");
+  const link = page.getByRole("link", { name: "Download Brownfield Testing Agent", exact: true });
+  await expect(link).toBeVisible();
+  await link.focus();
+  await expect(link).toBeFocused();
+  await verifyAgentDownload(page, testInfo, () => page.keyboard.press("Enter"));
+  await expect(page).toHaveURL(/#agent$/);
 });
