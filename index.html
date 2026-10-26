@@ -1464,15 +1464,15 @@ separate explicit approval. Never load-test this presentation&#39;s Pages site.
 <p>Put this playbook into practice with a reusable, client-neutral <strong>brownfield-testing</strong> custom agent. The profile guides evidence-backed discovery, application mapping, approved user journeys, risk-based test planning, focused implementation, and honest execution reporting across existing testing ecosystems.</p>
 <p><a href="downloads/brownfield-testing.agent.md" download="brownfield-testing.agent.md">Download Brownfield Testing Agent</a></p>
 
-<p><strong>Version:</strong> 1.0.0. <strong>Agent name/ID:</strong> <code>brownfield-testing</code>. This is a repository-discoverable <code>.agent.md</code> custom agent, not an <code>AGENTS.md</code> instructions file or a <code>SKILL.md</code> skill.</p>
+<p><strong>Version:</strong> 1.0.1. <strong>Agent name/ID:</strong> <code>brownfield-testing</code>. This is a <code>.agent.md</code> custom-agent profile, not an <code>AGENTS.md</code> instructions file or a <code>SKILL.md</code> skill.</p>
 <h3 id="review-install-and-select">Review, install, and select</h3>
 <ol>
 <li>Download and review the profile before sharing it with a client. Review existing customizations before saving; compare or back up an existing file instead of overwriting it.</li>
 <li>For a team repository, save the reviewed file at <code>.github/agents/brownfield-testing.agent.md</code> and follow that repository&#39;s normal review policy. For personal Copilot CLI use, save it at <code>~/.copilot/agents/brownfield-testing.agent.md</code>; on Windows, the equivalent is <code>$HOME\.copilot\agents\brownfield-testing.agent.md</code>.</li>
-<li>Select <code>brownfield-testing</code> using the host&#39;s supported custom-agent picker. Locations, discovery, and picker behavior vary by client and version; restart or reload an existing session if needed and consult the host documentation if the agent does not appear.</li>
+<li>Select <code>brownfield-testing</code> using the host&#39;s supported custom-agent picker when available. Locations, discovery, and picker behavior vary by client and version. Reload requirements vary; restarting is not a guaranteed registration fix. If the profile is not offered, use the explicit-read fallback below.</li>
 <li>Begin with a bounded discovery request, then approve implementation or execution separately when the scope and expected outcomes are clear.</li>
 </ol>
-<p><strong>Manual selection:</strong> The profile declares <code>disable-model-invocation: true</code> and <code>user-invocable: true</code>. It is designed to be selected by you, not automatically delegated to by another agent. It inherits the host&#39;s available model and tools rather than hardcoding a model, tool list, cloud identity, or client-specific path.</p>
+<p><strong>Host compatibility:</strong> The profile uses only <code>name</code> and <code>description</code> frontmatter for conservative compatibility. Default host invocation behavior applies; the profile does not enforce manual-only selection. Desktop picker discovery has not been verified. It inherits the host&#39;s available model and tools rather than hardcoding a model, tool list, cloud identity, or client-specific path.</p>
 <p><strong>Safety boundaries:</strong> Discovery is read-only by default. The agent separates observed behavior from approved requirements, preserves useful existing tests, reports uncertainty, and requires authorization for installations, external effects, publishing, fault injection, load tests, and billable cloud work. Downloading the file does not install dependencies, MCP servers, or browsers, supply credentials, or grant permissions. The profile complements technical controls; it is not a security boundary or a guarantee of coverage.</p>
 <h3 id="starter-request">Starter request</h3>
 <p>After selecting the agent, replace the bracketed scope and paste:</p>
@@ -1489,9 +1489,17 @@ Do not edit files, run setup, install tools, change services, publish,
 provision cloud resources, or execute tests/load until separately approved.
 Report what you actually inspected, visible unknowns, and the next review gate.
 </code></pre>
+<h3 id="if-the-agent-is-absent-from-the-picker">If the agent is absent from the picker</h3>
+<p>Save the reviewed download in an approved location readable from an authorized repository session, then explicitly ask Copilot to read it and follow the workflow for the current task. This applies task instructions; <strong>it does not register a picker agent</strong>, install tools, or change permissions.</p>
+<pre><code class="language-text">Read [REVIEWED_LOCAL_PROFILE_PATH] and follow its brownfield testing workflow
+for this authorized repository and task. This is task guidance, not a request
+to register an agent or change host permissions.
+Begin with discovery only; do not edit files, run setup, install tools,
+publish, provision resources, or execute tests/load without separate approval.
+</code></pre>
 <h3 id="share-one-source-not-divergent-copies">Share one source, not divergent copies</h3>
 <p>The repository&#39;s canonical profile is <a href="https://github.com/ashikaiapps/copilot-brownfield-testing/blob/main/.github/agents/brownfield-testing.agent.md"><code>.github/agents/brownfield-testing.agent.md</code></a>. The deployment packaging step copies its exact bytes to the public download; a missing source fails packaging. Review and update the canonical file rather than maintaining a second agent definition.</p>
-<p><strong>Version 1.0.0 SHA-256, LF UTF-8:</strong> <code>bd45430850561dd59a71a482314ff54451dbb1c983983d42b13b6966b8e8c61e</code>. Use the hosted page or local HTTP server for the downloadable file; a standalone HTML copy does not include linked assets.</p>
+<p><strong>Version 1.0.1 SHA-256, LF UTF-8:</strong> <code>6dad9f89feef256594fbee12d5c243df7fa18a42f5aae36878f14725bfe4dbae</code>. Use the hosted page or local HTTP server for the downloadable file; a standalone HTML copy does not include linked assets.</p>
 <p>Installation and support references: <a href="https://docs.github.com/en/copilot/reference/custom-agents-configuration">custom-agent configuration</a>, <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli">Copilot CLI custom agents</a>, <a href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents">repository custom agents</a>, and <a href="https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app">Copilot app customizations</a>.</p>
 <hr>
 <p><strong>Final takeaway</strong></p>

@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const agentSource = new URL("../.github/agents/brownfield-testing.agent.md", import.meta.url);
-const agentSha256 = "bd45430850561dd59a71a482314ff54451dbb1c983983d42b13b6966b8e8c61e";
+const agentSha256 = "6dad9f89feef256594fbee12d5c243df7fa18a42f5aae36878f14725bfe4dbae";
 
 test("PAGE-01: complete ten-stage tutorial and handout", async ({ page, request }) => {
   await page.goto("/");
@@ -328,7 +328,7 @@ test("PAGE-20: Azure guidance distinguishes cloud browsers from authorized proto
   await expect(loadPrompt).toContainText("Never load-test this presentation's Pages site.");
 });
 
-test("PAGE-21: canonical agent has valid manual-invocation metadata and approved safety/workflow content", async () => {
+test("PAGE-21: canonical agent has valid minimal metadata and approved safety/workflow content", async () => {
   const bytes = await readFile(agentSource);
   const profile = bytes.toString("utf8");
   expect(profile.length).toBeLessThan(30000);
@@ -346,13 +346,11 @@ test("PAGE-21: canonical agent has valid manual-invocation metadata and approved
   expect(fields).toEqual({
     name: "brownfield-testing",
     description: expect.stringContaining("Evidence-backed discovery, risk-based test planning"),
-    "disable-model-invocation": "true",
-    "user-invocable": "true",
   });
   expect(fields.description.length).toBeGreaterThan(50);
   expect(profile.match(/^## \d+\./gm)).toHaveLength(11);
   for (const obligation of [
-    "Version: 1.0.0",
+    "Version: 1.0.1",
     "Default discovery is read-only.",
     "Tool restrictions and approval denials must not be bypassed.",
     "Do not generate acceptance assertions for disputed rules.",
@@ -383,7 +381,12 @@ test("PAGE-22: agent navigation, safe installation guidance, and real download p
   await expect(page.getByText("~/.copilot/agents/brownfield-testing.agent.md", { exact: true })).toBeVisible();
   await expect(page.getByText("$HOME\\.copilot\\agents\\brownfield-testing.agent.md", { exact: true })).toBeVisible();
   await expect(page.getByText("Downloading the file does not install dependencies", { exact: false })).toBeVisible();
-  await expect(page.getByText("restart or reload an existing session if needed", { exact: false })).toBeVisible();
+  await expect(page.getByText("restarting is not a guaranteed registration fix.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Desktop picker discovery has not been verified.", { exact: false })).toBeVisible();
+  await expect(page.getByText("it does not register a picker agent", { exact: true })).toBeVisible();
+  const fallback = page.locator("pre").filter({ hasText: "Read [REVIEWED_LOCAL_PROFILE_PATH]" });
+  await expect(fallback).toContainText("This is task guidance, not a request");
+  await expect(fallback).toContainText("without separate approval.");
   const starter = page.locator("pre").filter({ hasText: "Assess [AUTHORIZED_REPOSITORY_OR_COMPONENT]" });
   await expect(starter).toContainText("Start with discovery only.");
   await expect(starter).toContainText("until separately approved.");

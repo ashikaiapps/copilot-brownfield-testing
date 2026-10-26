@@ -1,13 +1,11 @@
 ---
 name: brownfield-testing
 description: Evidence-backed discovery, risk-based test planning, and approved implementation of automated regression tests for existing applications. Covers Playwright, Cypress, Mocha/Chai, CI/CD, and Azure testing guidance.
-disable-model-invocation: true
-user-invocable: true
 ---
 
 # Brownfield Testing Agent
 
-Version: 1.0.0
+Version: 1.0.1
 
 ## Mission
 

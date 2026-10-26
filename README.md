@@ -14,9 +14,11 @@ Community references: [morluto/rea](https://github.com/morluto/rea) for authoriz
 
 The client-neutral `brownfield-testing` profile covers evidence-backed discovery, contracts/journeys, risk-based strategy, approved implementation, repeatable environments/data, execution evidence, CI/CD, and authorization-gated Azure planning. Discovery is read-only by default; the profile is not a tool installer, a security boundary, or a coverage guarantee.
 
-Review the download and existing customizations before saving. For a team repository, use `.github/agents/brownfield-testing.agent.md`. For personal Copilot CLI use, use `~/.copilot/agents/brownfield-testing.agent.md` (Windows: `$HOME\.copilot\agents\brownfield-testing.agent.md`). Compare or back up an existing file rather than overwriting it. Select **brownfield-testing** through your host's supported custom-agent picker; host/version support and discovery vary, and an existing session may need restart/reload. Picker hot-loading is not assumed.
+Review the download and existing customizations before saving. For a team repository, use `.github/agents/brownfield-testing.agent.md`. For personal Copilot CLI use, use `~/.copilot/agents/brownfield-testing.agent.md` (Windows: `$HOME\.copilot\agents\brownfield-testing.agent.md`). Compare or back up an existing file rather than overwriting it. Select **brownfield-testing** through your host's supported custom-agent picker when available. Host/version support and discovery vary; desktop picker registration is unverified, and restarting is not a guaranteed fix.
 
-The profile sets `disable-model-invocation: true` and `user-invocable: true` for manual selection, while inheriting the host's available model/tools. Downloading does not install dependencies, browsers, or MCP servers, supply credentials, or grant permissions. After selecting the agent, start with: “Assess this authorized repository for brownfield regression testing. Discovery only; do not edit files or run setup.” The presentation provides a fuller copyable request.
+Version **1.0.1** uses only `name` and `description` frontmatter for conservative compatibility. Default host invocation behavior applies; it is not restricted to manual-only selection. It inherits the host's available model/tools. Downloading does not install dependencies, browsers, or MCP servers, supply credentials, or grant permissions. After selecting the agent, start with: “Assess this authorized repository for brownfield regression testing. Discovery only; do not edit files or run setup.” The presentation provides a fuller copyable request.
+
+**If the picker does not offer the profile:** Save the reviewed download in an approved readable location and explicitly ask Copilot, in an authorized repository session: “Read [REVIEWED_LOCAL_PROFILE_PATH] and follow its brownfield testing workflow for this task. Discovery only; do not edit files or run setup.” This uses task instructions, **not picker registration**; it does not grant tools or permissions.
 
 `.github/agents/brownfield-testing.agent.md` is the **single source of truth**. `package-site.mjs` copies its exact bytes into `_site/downloads/brownfield-testing.agent.md`; the local HTTP server maps the same public URL directly to the canonical file. A missing input fails packaging. The packager requires `REVISION` to be a full commit SHA and refuses an existing `_site` directory, preventing stale/unlisted files from leaking into the deployment. There is no separately maintained public agent copy or one-click overwriting installer. See the [official configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration) and [CLI setup documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli) for host-specific support.
 
@@ -42,7 +44,7 @@ To edit content, update `playbook.md`, run `npm run render`, and commit both the
 | `index.html` | Complete self-contained presentation; semantic headings, anchor navigation, light/dark preference, copy feedback, mobile and print styles |
 | `playbook.md` | Full editable handout and prompt library |
 | `render.mjs` | Small development-only Markdown-to-HTML renderer and page template |
-| `.github/agents/brownfield-testing.agent.md` | Canonical shareable custom-agent profile, manually selected |
+| `.github/agents/brownfield-testing.agent.md` | Canonical shareable custom-agent profile with minimal metadata and host invocation defaults |
 | `package-site.mjs` | Dependency-free static artifact allowlist; derives the public agent download from the canonical source |
 | `server.mjs` | Local static server with an explicit public-file allowlist |
 | `tests/`, `playwright.config.mjs` | Independent browser checks and hosted revision smoke |
@@ -77,8 +79,8 @@ Twenty-three scenarios run in the desktop and mobile projects (Chromium and mobi
 | PAGE-18 | Narrow-screen reference tables expose column headers and support keyboard horizontal scrolling without overflowing the page |
 | PAGE-19 | Tool selection distinguishes runners/drivers/assertions and coverage instrumentation, preserves reviewed documentation links, and offers an approval-gated prompt |
 | PAGE-20 | Azure guidance distinguishes Playwright Workspaces from JMeter/Locust load testing, preserves official links, and documents cost/approval/no-public-stress boundaries |
-| PAGE-21 | Canonical profile has valid manual-selection frontmatter, a meaningful description, fewer than 30,000 characters, approved workflow/safety content, exact SHA-256 and LF UTF-8 bytes |
-| PAGE-22 | Agent navigation and installation/starter guidance are visible on mobile; HTTP response and actual browser download match canonical bytes and filename; hidden source URL is not served |
+| PAGE-21 | Canonical profile has valid minimal frontmatter, a meaningful description, fewer than 30,000 characters, approved workflow/safety content, exact SHA-256 and LF UTF-8 bytes |
+| PAGE-22 | Agent navigation, installation/starter guidance and explicit-read fallback are visible on mobile; HTTP response and actual browser download match canonical bytes and filename; hidden source URL is not served |
 | PAGE-23 | Packaging publishes only the exact allowlist, preserves source bytes/revision, refuses stale staging, and fails explicitly if the canonical agent is missing |
 | HOST-01 | Hosted page preserves the tutorial/guidance; live agent response equals canonical bytes/SHA-256; `version.json` identifies the exact deployed commit |
 

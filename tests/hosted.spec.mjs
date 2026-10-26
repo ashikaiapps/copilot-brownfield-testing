@@ -24,7 +24,7 @@ test("HOST-01: deployed content and revision match the tested commit", async ({ 
   const bytes = await download.body();
   expect(bytes).toEqual(await readFile(new URL("../.github/agents/brownfield-testing.agent.md", import.meta.url)));
   expect(createHash("sha256").update(bytes).digest("hex"))
-    .toBe("bd45430850561dd59a71a482314ff54451dbb1c983983d42b13b6966b8e8c61e");
+    .toBe("6dad9f89feef256594fbee12d5c243df7fa18a42f5aae36878f14725bfe4dbae");
   const version = await request.get("version.json");
   expect(version.ok()).toBeTruthy();
   expect(process.env.EXPECTED_SHA, "Hosted checks require EXPECTED_SHA").toBeTruthy();
