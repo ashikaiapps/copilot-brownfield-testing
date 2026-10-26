@@ -140,7 +140,8 @@ test("PAGE-10: chapter navigation and back-to-top reach their destinations", asy
   const navigation = page.getByRole("navigation", { name: "Presentation navigation" });
   for (const [label, target] of [
     ["Overview", "overview"], ["10 stages", "tutorial"], ["Coverage", "coverage"],
-    ["Skills", "skills"], ["Demo & CI", "demo"], ["References", "references"],
+    ["Skills", "skills"], ["Demo & CI", "demo"], ["Test tools", "tools"],
+    ["Azure at scale", "azure"], ["References", "references"],
   ]) {
     await navigation.getByRole("link", { name: label, exact: true }).click();
     await expect(page.locator(`#${target}`)).toBeInViewport();
@@ -268,4 +269,54 @@ test("PAGE-18: reference tables are keyboard-scrollable on narrow screens", asyn
   await page.keyboard.press("ArrowRight");
   await expect.poll(() => table.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
+test("PAGE-19: tool comparison separates runners, drivers, assertions, and instrumentation", async ({ page }) => {
+  await page.goto("/#tools");
+  await expect(page.locator("#tools")).toHaveText("13. Choosing the right test tools: Playwright, Cypress, Mocha, and Chai");
+  await expect(page.locator("#tools")).toBeInViewport();
+  for (const phrase of [
+    "Cypress bundles Mocha and Chai internally.",
+    "Mocha does not drive browsers or supply built-in assertions.",
+    "Chai is an assertion library, not a test runner or browser driver.",
+    "Browser automation does not require code-coverage counters.",
+    "Playwright's JavaScript/CSS Coverage API is Chromium-only.",
+    "The plugin does not instrument the application automatically.",
+  ]) {
+    await expect(page.getByText(phrase, { exact: false })).toBeVisible();
+  }
+  for (const [name, url] of [
+    ["Playwright Coverage API: Chromium only", "https://playwright.dev/docs/api/class-coverage"],
+    ["Cypress bundled libraries: Mocha and Chai", "https://docs.cypress.io/app/references/bundled-libraries"],
+    ["Mocha documentation", "https://mochajs.org/"],
+    ["Chai documentation", "https://www.chaijs.com/"],
+  ]) {
+    await expect(page.getByRole("link", { name, exact: true })).toHaveAttribute("href", url);
+  }
+  const selection = page.locator("pre").filter({ hasText: "Assess test tooling for [CAPABILITY]" });
+  await expect(selection).toContainText("Do not install dependencies, migrate suites, instrument builds");
+  await expect(selection.locator("xpath=preceding-sibling::*[1]").getByRole("button")).toHaveAccessibleName(/^Copy text block \d+$/);
+});
+
+test("PAGE-20: Azure guidance distinguishes cloud browsers from authorized protocol load", async ({ page }) => {
+  await page.goto("/#azure");
+  await expect(page.locator("#azure")).toHaveText("14. Azure at scale: Playwright Workspaces and Azure Load Testing");
+  await expect(page.locator("#azure")).toBeInViewport();
+  await expect(page.getByText("Azure Load Testing does not directly ingest ordinary Playwright specs.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Apache JMeter and Locust", { exact: false })).toBeVisible();
+  await expect(page.getByText("Twenty Playwright workers are not a model of twenty production virtual users.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Budget alerts are notifications, not a hard cost cutoff", { exact: false })).toBeVisible();
+  await expect(page.getByText("It does not configure or run Azure tests", { exact: false })).toBeVisible();
+  for (const [name, url] of [
+    ["official Azure Load Testing overview", "https://learn.microsoft.com/en-us/azure/app-testing/load-testing/overview-what-is-azure-load-testing"],
+    ["official Workspaces quickstart", "https://learn.microsoft.com/en-us/azure/app-testing/playwright-workspaces/quickstart-run-end-to-end-tests"],
+    ["Edge/Chrome recording extension", "https://learn.microsoft.com/en-us/azure/app-testing/load-testing/quickstart-create-run-load-tests-from-recording"],
+    ["official Azure Load Testing CI/CD guide", "https://learn.microsoft.com/en-us/azure/app-testing/load-testing/how-to-configure-load-test-cicd"],
+  ]) {
+    await expect(page.getByRole("link", { name, exact: true })).toHaveAttribute("href", url);
+  }
+  const cloudPrompt = page.locator("pre").filter({ hasText: "Assess whether our approved Playwright suite" });
+  await expect(cloudPrompt).toContainText("without explicit approval.");
+  const loadPrompt = page.locator("pre").filter({ hasText: "Use approved [SCENARIO_ID], its contracts" });
+  await expect(loadPrompt).toContainText("Never load-test this presentation's Pages site.");
 });

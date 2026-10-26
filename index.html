@@ -136,6 +136,8 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
       <a href="#coverage">Coverage</a>
       <a href="#skills">Skills</a>
       <a href="#demo">Demo &amp; CI</a>
+      <a href="#tools">Test tools</a>
+      <a href="#azure">Azure at scale</a>
       <a href="#references">References</a>
       <a href="playbook.md">Markdown handout</a>
     </nav>
@@ -1084,7 +1086,7 @@ Produce discovery artifacts only; do not implement tests yet.
 </tr>
 </tbody></table></div>
 <h3 id="explore-the-automated-delivery-demonstration">Explore the automated delivery demonstration</h3>
-<p>The companion repository runs <strong>18 independent regression scenarios in two browser profiles: 36 checks</strong>, followed by one hosted check against the deployed commit. These tests cover this presentation&#39;s content and interactions, not the fictional purchase-request backend.</p>
+<p>The companion repository runs <strong>20 independent regression scenarios in two browser profiles: 40 checks</strong>, followed by one hosted check against the deployed commit. These tests cover this presentation&#39;s content and interactions, not the fictional purchase-request backend.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
@@ -1235,6 +1237,228 @@ Do not copy unnecessary tooling or claim the skill guarantees coverage.
 <p>The companion repository is <a href="https://github.com/ashikaiapps/copilot-brownfield-testing">ashikaiapps/copilot-brownfield-testing</a>.</p>
 <p>Explore a working reference: a static HTML presentation, a Playwright test harness, and GitHub Actions that test each change before deploying the main-branch artifact to GitHub Pages. Post-deployment verification checks the hosted page and exact commit. A separate, manually triggered workflow demonstrates an intentional failure without affecting delivery.</p>
 <p>The presentation page is the application under test in this reference. It demonstrates regression-testing and delivery mechanics without a business backend; applying the approach to your application requires its own discovery, approved expectations, and coverage scope.</p>
+<hr>
+<h2 id="tools">13. Choosing the right test tools: Playwright, Cypress, Mocha, and Chai</h2>
+<p>Choose a tool for its role in your test strategy, rather than adding every framework to the application. <strong>Mocha</strong>, often paired with <strong>Chai</strong>, is the JavaScript testing combination with coffee- and tea-inspired names.</p>
+<h3 id="runner-browser-driver-and-assertions-are-different-responsibilities">Runner, browser driver, and assertions are different responsibilities</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
+<thead>
+<tr>
+<th scope="col">Tool</th>
+<th scope="col">What it provides</th>
+<th scope="col">Typical use</th>
+<th scope="col">Important distinction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Playwright Test</td>
+<td>JavaScript/TypeScript runner, browser automation, assertions, fixtures, parallel execution, and traces</td>
+<td>Cross-browser, cross-layer user journeys; multiple pages, popups, and isolated user contexts</td>
+<td><code>@playwright/test</code> is the integrated JS/TS runner. The separate Playwright library supports other runner arrangements; the wider Playwright ecosystem also has other language bindings.</td>
+</tr>
+<tr>
+<td>Cypress</td>
+<td>Web E2E and supported frontend component testing, an interactive runner, retryable queries, and network controls</td>
+<td>Interactive development/debugging and regression checks in an established Cypress or component-testing workflow</td>
+<td>Uses a queued command model, not Playwright-style <code>async</code>/<code>await</code>. Cypress bundles Mocha and Chai internally.</td>
+</tr>
+<tr>
+<td>Mocha</td>
+<td>JavaScript test runner with suites, hooks, asynchronous tests, and reporters</td>
+<td>JavaScript unit tests, API tests with a client, and integration tests with suitable fixtures</td>
+<td>Mocha does not drive browsers or supply built-in assertions. Add an assertion library, client, or browser driver only when needed.</td>
+</tr>
+<tr>
+<td>Chai</td>
+<td>Assertion styles such as <code>expect</code>, <code>should</code>, and <code>assert</code></td>
+<td>Expressing expected outcomes in JavaScript tests, often with Mocha</td>
+<td>Chai is an assertion library, not a test runner or browser driver.</td>
+</tr>
+</tbody></table></div>
+<p><strong>Playwright</strong> is a strong fit when Chromium, Firefox, and WebKit coverage, multiple pages, or independently authenticated browser contexts are important. Its mobile emulation approximates browser/device characteristics; it is not native mobile device testing.</p>
+<p><strong>Cypress</strong> is a strong fit for its interactive workflow and supported component-testing ecosystem. Keep healthy existing suites when they meet the requirements. Use <code>cy.origin()</code> for supported cross-origin cases, and <code>cy.request()</code> or <code>cy.task()</code> for suitable backend setup and integration boundaries. Cypress does not provide native simultaneous multiple-browser control; some tab scenarios have plugin options. Review current trade-offs against your actual journeys rather than relying on blanket restrictions.</p>
+<h3 id="two-meanings-of-instrumentation">Two meanings of instrumentation</h3>
+<p><strong>Harness integration</strong> connects tests to an application: configuration, startup/readiness, locators, accounts, synthetic data, execution, and reports. Browser automation does not require code-coverage counters. Adding stable test IDs improves targeting but is not full coverage instrumentation.</p>
+<p><strong>Code-coverage instrumentation</strong> measures which source statements, branches, or functions execute. It requires runtime-specific collection and reporting, often through a dedicated instrumented test build. It does not prove that assertions are meaningful or that every business behavior is covered.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
+<thead>
+<tr>
+<th scope="col">Harness</th>
+<th scope="col">Integration with an existing application</th>
+<th scope="col">Source-execution coverage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Playwright Test</td>
+<td>Configure <code>baseURL</code>, readiness, fixtures, authentication, isolated data, and browser projects; run <code>npx playwright test</code></td>
+<td>Playwright&#39;s JavaScript/CSS Coverage API is Chromium-only. Alternatively, explicitly instrument a frontend test build and collect/report its counters. Measure backend code separately with its runtime&#39;s tooling.</td>
+</tr>
+<tr>
+<td>Cypress</td>
+<td>Configure E2E <code>baseUrl</code>, specs, support files, application readiness, and data setup; run <code>npx cypress run</code></td>
+<td>Use an Istanbul-compatible instrumented application build plus <code>@cypress/code-coverage</code> collection, support, and tasks. The plugin does not instrument the application automatically.</td>
+</tr>
+<tr>
+<td>Mocha + Chai</td>
+<td>Choose compatible module formats and test files, add assertions and appropriate clients, and define setup/cleanup hooks; run <code>npx mocha</code></td>
+<td>For compatible Node.js code, tools such as <code>c8</code> or <code>nyc</code> collect coverage; <code>npx c8 mocha</code> is an illustrative command. Explicitly configure inclusion of unexecuted source, exclusions, and source maps so the denominator is meaningful.</td>
+</tr>
+</tbody></table></div>
+<p>These are integration examples, not commands executed by this presentation. Inspect runtime compatibility, dependency versions, module formats, and existing scripts before adopting them. Do not change a legacy application&#39;s runtime just to copy a command; a separate modern browser-test harness may be the better boundary.</p>
+<h3 id="apply-the-tools-to-one-purchase-request-journey">Apply the tools to one purchase-request journey</h3>
+<ol>
+<li>Test amount boundaries and approval rules close to their implementation. Mocha plus Chai can suit JavaScript rules; use an appropriate .NET or Java unit runner when the rules live in those runtimes.</li>
+<li>Verify API contracts, authorization, persistence, and state transitions through integration tests with approved accounts and synthetic data.</li>
+<li>Use Playwright <strong>or</strong> Cypress to verify that an employee can submit a request and the manager sees the approved outcome. Select based on existing investments and the journey&#39;s browser requirements.</li>
+<li>Link every layer to the same approved rule and scenario IDs. Preserve useful existing tests; adopting a browser tool does not require a rewrite of the test portfolio.</li>
+</ol>
+<p>Adjacent options include Selenium/WebDriver for established browser suites, Jest/Vitest for JavaScript unit/component testing, Appium for native or hybrid mobile applications, and k6 for performance workloads. Select the missing capability, not an entire new tool catalog.</p>
+<h3 id="copilot-prompt-select-the-smallest-appropriate-harness">Copilot prompt: select the smallest appropriate harness</h3>
+<pre><code class="language-text">Assess test tooling for [CAPABILITY] in this authorized repository.
+This is a read-only assessment except for [APPROVED_REPORT_PATH].
+
+Inspect existing tests, runners, language/runtime versions, module formats,
+UI frameworks, required browsers, authentication, startup/readiness,
+synthetic data, CI constraints, and current reports.
+
+Compare retaining the current harness with adding Playwright, Cypress,
+or Mocha/Chai only at the layers where they fit.
+Distinguish runner, browser driver, assertions, harness integration,
+and source-code coverage instrumentation.
+If rules are not JavaScript, use their native runtime&#39;s testing tools.
+
+Preserve useful existing tests and approved expectations.
+Propose the smallest setup, readiness check, isolated data strategy,
+one approved scenario, CI execution, and failure reporting.
+State which source can be measured, how unexecuted source is included,
+and any browser/runtime, stubbing, source-map, or coverage limitations.
+
+Do not install dependencies, migrate suites, instrument builds,
+change runtimes, or run setup until explicitly approved.
+Do not imply that a tool or a coverage percentage proves correctness.
+</code></pre>
+<h3 id="tool-documentation">Tool documentation</h3>
+<ul>
+<li><a href="https://playwright.dev/docs/library">Playwright library and Playwright Test</a></li>
+<li><a href="https://playwright.dev/docs/api/class-coverage">Playwright Coverage API: Chromium only</a></li>
+<li><a href="https://docs.cypress.io/app/references/trade-offs">Cypress trade-offs</a></li>
+<li><a href="https://docs.cypress.io/app/references/bundled-libraries">Cypress bundled libraries: Mocha and Chai</a></li>
+<li><a href="https://docs.cypress.io/app/tooling/code-coverage">Cypress code coverage</a></li>
+<li><a href="https://mochajs.org/">Mocha documentation</a></li>
+<li><a href="https://www.chaijs.com/">Chai documentation</a></li>
+<li><a href="https://github.com/bcoe/c8">c8: Node.js coverage</a></li>
+</ul>
+<hr>
+<h2 id="azure">14. Azure at scale: Playwright Workspaces and Azure Load Testing</h2>
+<p><strong>Supported-framework distinction, checked October 26, 2026:</strong> Azure Load Testing does not directly ingest ordinary Playwright specs. The <a href="https://learn.microsoft.com/en-us/azure/app-testing/load-testing/overview-what-is-azure-load-testing">official Azure Load Testing overview</a> currently lists Apache JMeter and Locust as its supported testing frameworks, not Playwright.</p>
+<p>Within <a href="https://learn.microsoft.com/en-us/azure/app-testing/overview-what-is-azure-app-testing">Azure App Testing</a>, <strong>Playwright Workspaces</strong> runs supported existing Playwright tests with cloud browsers. <strong>Azure Load Testing</strong> runs separately designed performance and capacity workloads. They answer complementary questions.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
+<thead>
+<tr>
+<th scope="col">Your objective</th>
+<th scope="col">Appropriate path</th>
+<th scope="col">What it measures or produces</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Run an existing Playwright suite on cloud browsers</td>
+<td>Playwright Workspaces</td>
+<td>Functional outcomes, browser compatibility, and the duration of those test journeys</td>
+</tr>
+<tr>
+<td>Evaluate traffic, throughput, and capacity</td>
+<td>Azure Load Testing with JMeter, Locust, or a supported URL-based test</td>
+<td>Responses, latency, errors, and capacity under an explicit workload model</td>
+</tr>
+<tr>
+<td>Draft a workload from an authorized browser recording</td>
+<td>Azure App Testing extension for Edge/Chrome</td>
+<td>A generated JMeter draft to review and parameterize, not Playwright DOM replay</td>
+</tr>
+<tr>
+<td>Observe a visible user journey while the backend is under load</td>
+<td>Coordinate separate Playwright checks with an authorized JMeter/Locust run</td>
+<td>Browser-level observations and protocol-level load metrics, reported separately</td>
+</tr>
+</tbody></table></div>
+<p><strong>Twenty Playwright workers are not a model of twenty production virtual users.</strong> Functional parallelism does not define arrivals, think time, duration, transaction mix, or throughput. Protocol virtual users do not execute the full rendered browser interface. Request p95 latency is not the same metric as rendered-page or end-to-end journey duration.</p>
+<h3 id="path-a-scale-functional-execution-with-playwright-workspaces">Path A: scale functional execution with Playwright Workspaces</h3>
+<p><strong>Intent:</strong> Reuse approved Playwright tests on managed cloud browsers without treating parallel execution as a capacity benchmark.</p>
+<p><strong>Outputs:</strong> A reviewed service configuration, application/network/data readiness plan, one-scenario validation result, and an approved concurrency and cost envelope.</p>
+<ol>
+<li>Validate supported Playwright/SDK versions and local assumptions against the <a href="https://learn.microsoft.com/en-us/azure/app-testing/playwright-workspaces/quickstart-run-end-to-end-tests">official Workspaces quickstart</a>.</li>
+<li>Obtain subscription, region, quota, cost, and resource-scoped role approval before creating or using a workspace. Review the official initializer, <code>npm init @azure/playwright@latest</code>, and its proposed changes before execution.</li>
+<li>Configure the generated <code>playwright.service.config.ts</code>. <code>PLAYWRIGHT_SERVICE_URL</code> identifies the browser service endpoint; it is separate from the application&#39;s <code>baseURL</code>.</li>
+<li>Authenticate to Azure with Microsoft Entra ID: local <code>az login</code> where approved, and preferably workload identity/OIDC in trusted CI. Azure authentication does not log a browser into your application; application roles and authentication remain separate.</li>
+<li>Verify that cloud browsers can reach the approved application build, identity provider, and test-data services through the intended network. A locally reachable <code>localhost</code> application is not automatically reachable from Azure browsers.</li>
+<li>Validate one approved scenario before increasing concurrency. Isolate server-side records and accounts as well as browser contexts, and approve report/trace privacy, retention, quotas, and cost controls.</li>
+</ol>
+<p><strong>Documentation examples only:</strong> These commands require the generated configuration, compatible SDK, approved Azure resources, authentication, and network access. They have not been executed for this repository and are not capacity benchmarks.</p>
+<pre><code class="language-text">npx playwright test tests/example.spec.ts --config=playwright.service.config.ts --workers=1
+npx playwright test --config=playwright.service.config.ts --workers=20
+</code></pre>
+<h3 id="copilot-prompt-assess-cloud-browser-execution">Copilot prompt: assess cloud browser execution</h3>
+<pre><code class="language-text">Assess whether our approved Playwright suite can use Azure Playwright
+Workspaces for [SCENARIO_ID]. Write [APPROVED_REPORT_PATH] only.
+
+Check supported test-runner/SDK versions, local assumptions, cloud-browser
+network reachability, application baseURL versus PLAYWRIGHT_SERVICE_URL,
+Entra authentication and application login as separate concerns,
+role-scoped identities, accounts, synthetic data, parallel isolation,
+report/trace privacy, region, quotas, concurrency, and cost.
+
+Propose the smallest service configuration while preserving local runs.
+Include a one-test validation plan before any higher-concurrency run,
+readiness checks, cleanup, and approved result-retention controls.
+Mark unverified access and compatibility assumptions explicitly.
+
+Do not provision resources, install the initializer/SDK, create identities,
+change networking, or run billable tests without explicit approval.
+Do not describe worker count or functional duration as a capacity result.
+</code></pre>
+<h3 id="path-b-design-a-separate-workload-for-azure-load-testing">Path B: design a separate workload for Azure Load Testing</h3>
+<p><strong>Intent:</strong> Measure an approved build under a defined, representative workload using JMeter or Locust, not by importing a Playwright spec.</p>
+<p><strong>Outputs:</strong> A reviewed workload script and load-test configuration, explicit business assertions and performance criteria, emergency-stop controls, a telemetry correlation plan, and a comparable baseline.</p>
+<ol>
+<li>Select the exact authorized nonproduction build and agree its readiness checks. Define the concurrency or arrival model, ramp-up, duration, think time, transaction mix, data volume, and allowed endpoints.</li>
+<li>Derive a separate JMeter or Locust workload from approved journeys, contracts, and authorized network evidence. The <a href="https://learn.microsoft.com/en-us/azure/app-testing/load-testing/quickstart-create-run-load-tests-from-recording">Edge/Chrome recording extension</a> can generate a JMeter draft; it does not import Playwright tests or automatically translate DOM interactions into a valid workload.</li>
+<li>Correlate changing tokens, CSRF values, and sessions. Parameterize synthetic users and unique records; assert business responses and state rather than HTTP 200 alone. Remove captured secrets and exclude analytics, real payments, email, and unapproved third parties.</li>
+<li>Validate one virtual user before scaling. Review Azure test-engine counts, region, private/network access, resource-scoped roles, secrets handling, quotas, and cost before an approved run.</li>
+<li>Agree fail criteria <strong>and separate emergency-stop controls</strong>. Illustrative criteria might be a named operation&#39;s request p95 latency at or below 2,000 ms and failed requests at or below 1%; owners must approve actual metrics, units, operation scope, aggregation window, and equality semantics. These are examples, not configured targets or measured results.</li>
+<li>Correlate run ID and timestamps with available Azure Monitor, Application Insights, or equivalent telemetry: CPU, memory, database waits, dependencies, errors, and queues. Use existing approved observability; this guidance does not install an application telemetry SDK.</li>
+<li>Establish a baseline, apply the approved ramp, and compare equivalent builds and environments. Report protocol latency separately from any coordinated browser journey duration, and document bottlenecks, cleanup, and release implications.</li>
+</ol>
+<p>Use the <a href="https://learn.microsoft.com/en-us/azure/app-testing/load-testing/how-to-define-test-criteria">official fail-criteria documentation</a> to distinguish a failed test result from the conditions that automatically stop unsafe or unproductive traffic. Budget alerts are notifications, not a hard cost cutoff; apply explicit duration, engine, and concurrency caps.</p>
+<h3 id="copilot-prompt-design-an-authorized-performance-workload">Copilot prompt: design an authorized performance workload</h3>
+<pre><code class="language-text">Use approved [SCENARIO_ID], its contracts, and authorized network evidence
+to propose a separate JMeter or Locust plan for Azure Load Testing.
+Write [APPROVED_REPORT_PATH]. Do not execute the plan.
+
+This is not direct Playwright ingestion or an automatic DOM-to-protocol
+conversion. Explain which requests represent the business journey and
+which browser-only observations require separate functional checks.
+
+Document business-response assertions, token/CSRF/session correlation,
+synthetic identities, unique data, cleanup, secret redaction,
+and exclusion of analytics, payments, email, and unapproved third parties.
+
+Specify the authorized build/environment and readiness checks, workload
+model, arrivals or concurrency, ramp, duration, think time, transaction
+mix, endpoint scope, engines, network, roles, quotas, and cost envelope.
+Separate owner-approved pass/fail thresholds from emergency-stop rules.
+Define telemetry/run-ID correlation, baseline comparisons, reporting,
+and the proposed release gate. Mark assumptions and unknowns.
+
+Do not provision resources, change identities or networking, run billable
+tests, send production traffic, or stress any public site without
+separate explicit approval. Never load-test this presentation&#39;s Pages site.
+</code></pre>
+<h3 id="ci-cd-integration-documentation-not-an-enabled-cloud-workflow">CI/CD integration: documentation, not an enabled cloud workflow</h3>
+<p>Keep fast functional checks on normal pushes and pull requests. Run costly performance checks only through approved manual, scheduled, or release-candidate policies; untrusted pull requests must not receive trusted Azure credentials.</p>
+<p>For an approved implementation, review and commit the workload script and load-test YAML, scope OIDC identities to the required resource (for example, the Load Test Contributor role), and protect the trusted execution environment. Verify the exact ready application build, then use an action or CLI supported by the <a href="https://learn.microsoft.com/en-us/azure/app-testing/load-testing/how-to-configure-load-test-cicd">official Azure Load Testing CI/CD guide</a>. Wait for the run, publish approved reports, and fail the gate on execution errors or failed criteria.</p>
+<p>If browser observations under load are required, coordinate separate approved Playwright checks while the load run is active. Apply monitoring, emergency stops, time/concurrency limits, and controlled cleanup; do not confuse separate browser and protocol measurements.</p>
+<p><strong>Implementation boundary:</strong> This update documents Azure testing paths only. It does not configure or run Azure tests, provision resources, install additional test frameworks, or authorize stress traffic to the public presentation site. Existing Playwright CI and Pages deployment remain the implemented demonstration.</p>
+<hr>
 <p><strong>Final takeaway</strong></p>
 <blockquote>
 <p>The deliverable is not a pile of AI-generated tests. It is a maintained chain of evidence from business intent to application behavior to automated release confidence.</p>

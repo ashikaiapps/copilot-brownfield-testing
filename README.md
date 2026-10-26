@@ -2,7 +2,7 @@
 
 [Read the presentation](https://ashikaiapps.github.io/copilot-brownfield-testing/) | [Complete Markdown handout](playbook.md) | [CI and deployment runs](https://github.com/ashikaiapps/copilot-brownfield-testing/actions/workflows/site.yml)
 
-A customer-facing, evidence-first playbook for adding trusted tests to established applications. Ten implementation stages include reusable prompts, intent, outputs, and review gates, followed by coverage guidance, reusable skills, a twelve-minute walkthrough, and working CI evidence.
+A customer-facing, evidence-first playbook for adding trusted tests to established applications. Ten implementation stages include reusable prompts, intent, outputs, and review gates, followed by coverage guidance, reusable skills, a twelve-minute walkthrough, and working CI evidence. [Tool selection](https://ashikaiapps.github.io/copilot-brownfield-testing/#tools) compares Playwright, Cypress, Mocha, and Chai; [Azure at scale](https://ashikaiapps.github.io/copilot-brownfield-testing/#azure) distinguishes cloud browser execution from protocol-level load testing.
 
 The application under test **in this repository is just the presentation page**. It demonstrates deterministic testing and test-gated delivery, not a real legacy backend, purchase-request implementation, or complete application coverage. No third-party skill or reverse-engineering tool is installed.
 
@@ -39,7 +39,7 @@ To edit content, update `playbook.md`, run `npm run render`, and commit both the
 
 ## Executable scenarios
 
-Eighteen scenarios run in both desktop Chromium and Chromium mobile emulation: **36 checks per local/CI run**. PAGE-09 through PAGE-18 are ten additional scenarios. A separate post-deployment check brings the main-branch delivery workflow total to **37**. Actual passed, failed, flaky, and skipped counts appear in the Actions job summary and downloadable report.
+Twenty scenarios run in both desktop Chromium and Chromium mobile emulation: **40 checks per local/CI run**. PAGE-09 through PAGE-18 are the ten expanded interaction scenarios; PAGE-19 and PAGE-20 check tool-selection and Azure guidance. A separate post-deployment check brings the main-branch delivery workflow total to **41**. Actual passed, failed, flaky, and skipped counts appear in the Actions job summary and downloadable report.
 
 | ID | Approved observable outcome |
 |---|---|
@@ -61,7 +61,9 @@ Eighteen scenarios run in both desktop Chromium and Chromium mobile emulation: *
 | PAGE-16 | Customer-facing copy replaces conversational replies and internal presenter notes |
 | PAGE-17 | Delivery evidence and the intentional-failure demonstration link to separate workflows with explicit expectations |
 | PAGE-18 | Narrow-screen reference tables expose column headers and support keyboard horizontal scrolling without overflowing the page |
-| HOST-01 | Hosted page responds, has the correct title/ten stages, and `version.json` identifies the exact deployed commit |
+| PAGE-19 | Tool selection distinguishes runners/drivers/assertions and coverage instrumentation, preserves reviewed documentation links, and offers an approval-gated prompt |
+| PAGE-20 | Azure guidance distinguishes Playwright Workspaces from JMeter/Locust load testing, preserves official links, and documents cost/approval/no-public-stress boundaries |
+| HOST-01 | Hosted page has the correct title, ten stages, new guidance and framework distinction; `version.json` identifies the exact deployed commit |
 
 PAGE-05 and the keyboard activation part of PAGE-06 simulate clipboard denial. PAGE-14 uses a controlled clipboard adapter that rejects once and resolves once to test feedback recovery; it does not claim to exercise the OS clipboard. PAGE-04 uses real clipboard read/write, not a success stub. Real clipboard tests use the same immutable prompt; no tests share server-side mutable data. Browser storage is isolated per test.
 
@@ -69,7 +71,7 @@ These checks do **not** demonstrate exhaustive accessibility, Firefox/WebKit or 
 
 ## CI/CD behavior
 
-- Every pushed branch commit and pull-request update runs the 36 browser checks and source/HTML consistency check. A local commit alone does not trigger GitHub Actions.
+- Every pushed branch commit and pull-request update runs the 40 browser checks and source/HTML consistency check. A local commit alone does not trigger GitHub Actions.
 - Only `main` pushes (or a manual run on `main`) can deploy, and only after the test job passes. Pull requests use read-only permissions and never deploy; there is no privileged `pull_request_target` execution.
 - The deployment job alone receives `pages: write` and `id-token: write`. Official Pages actions publish **only** `index.html`, `playbook.md`, and a generated `version.json`. Dependencies, reports, and traces are never placed in the public site.
 - The hosted-smoke job waits for successful deployment, uses its actual URL, and compares the hosted revision to `github.sha`; it cannot silently fall back to localhost. Runs for the same branch are serialized across testing, deployment, and smoke to avoid overlapping deployments.
@@ -100,3 +102,9 @@ npm run test:demo-failure
 The manual workflow remains red, shows the expected/actual difference, and always uploads `intentional-failure-evidence` with the HTML report, screenshot, JSON results, and trace (seven-day retention). It has read-only repository permissions, no deployment job, and cannot publish the injected regression. It is excluded from normal regression and hosted-smoke projects; neither the public page nor the deployment gate is weakened.
 
 Inspect local evidence with `npx playwright show-report playwright-report-demo` or open the recorded `trace.zip` with `npx playwright show-trace`. Demo output stays in ignored `playwright-report-demo` and `test-results-demo` directories, separate from the passing suite's evidence.
+
+## Azure guidance is documentation only
+
+Azure Load Testing currently supports JMeter and Locust, not direct ingestion of ordinary Playwright specs. Use Azure App Testing's Playwright Workspaces for supported Playwright suites on cloud browsers, or design a separate approved JMeter/Locust workload for performance testing. A recorded browser session can produce a JMeter draft, not an automatic Playwright-to-load-test conversion.
+
+The presentation includes configuration prerequisites, harness versus code-coverage instrumentation, Entra/OIDC versus application login, network/data isolation, telemetry, performance criteria, emergency stops, quotas/cost controls, and copyable assessment prompts. All Cypress, Mocha, coverage, and Azure commands are educational examples; this repository does not install those tools, provision Azure resources, enable billable cloud workflows, or execute load tests. **Do not stress the public Pages site without separate explicit authorization.**
