@@ -833,7 +833,7 @@ The purchase-request example uses synthetic data and contains no customer inform
 
 ### Explore the automated delivery demonstration
 
-The companion repository runs **20 independent regression scenarios in two browser profiles: 40 checks**, followed by one hosted check against the deployed commit. These tests cover this presentation's content and interactions, not the fictional purchase-request backend.
+The companion repository runs **23 independent scenarios in desktop and mobile projects: 46 checks**, including agent-profile and packaging contracts, followed by one hosted check against the deployed commit. These tests cover this presentation, its downloads, and delivery mechanics, not the fictional purchase-request backend.
 
 | Demonstration | What to inspect | Evidence |
 |---|---|---|
@@ -1139,6 +1139,54 @@ For an approved implementation, review and commit the workload script and load-t
 If browser observations under load are required, coordinate separate approved Playwright checks while the load run is active. Apply monitoring, emergency stops, time/concurrency limits, and controlled cleanup; do not confuse separate browser and protocol measurements.
 
 **Implementation boundary:** This update documents Azure testing paths only. It does not configure or run Azure tests, provision resources, install additional test frameworks, or authorize stress traffic to the public presentation site. Existing Playwright CI and Pages deployment remain the implemented demonstration.
+
+---
+
+## 15. Download Brownfield Testing Agent
+
+Put this playbook into practice with a reusable, client-neutral **brownfield-testing** custom agent. The profile guides evidence-backed discovery, application mapping, approved user journeys, risk-based test planning, focused implementation, and honest execution reporting across existing testing ecosystems.
+
+<p><a href="downloads/brownfield-testing.agent.md" download="brownfield-testing.agent.md">Download Brownfield Testing Agent</a></p>
+
+**Version:** 1.0.0. **Agent name/ID:** `brownfield-testing`. This is a repository-discoverable `.agent.md` custom agent, not an `AGENTS.md` instructions file or a `SKILL.md` skill.
+
+### Review, install, and select
+
+1. Download and review the profile before sharing it with a client. Review existing customizations before saving; compare or back up an existing file instead of overwriting it.
+2. For a team repository, save the reviewed file at `.github/agents/brownfield-testing.agent.md` and follow that repository's normal review policy. For personal Copilot CLI use, save it at `~/.copilot/agents/brownfield-testing.agent.md`; on Windows, the equivalent is `$HOME\.copilot\agents\brownfield-testing.agent.md`.
+3. Select `brownfield-testing` using the host's supported custom-agent picker. Locations, discovery, and picker behavior vary by client and version; restart or reload an existing session if needed and consult the host documentation if the agent does not appear.
+4. Begin with a bounded discovery request, then approve implementation or execution separately when the scope and expected outcomes are clear.
+
+**Manual selection:** The profile declares `disable-model-invocation: true` and `user-invocable: true`. It is designed to be selected by you, not automatically delegated to by another agent. It inherits the host's available model and tools rather than hardcoding a model, tool list, cloud identity, or client-specific path.
+
+**Safety boundaries:** Discovery is read-only by default. The agent separates observed behavior from approved requirements, preserves useful existing tests, reports uncertainty, and requires authorization for installations, external effects, publishing, fault injection, load tests, and billable cloud work. Downloading the file does not install dependencies, MCP servers, or browsers, supply credentials, or grant permissions. The profile complements technical controls; it is not a security boundary or a guarantee of coverage.
+
+### Starter request
+
+After selecting the agent, replace the bracketed scope and paste:
+
+```text
+Assess [AUTHORIZED_REPOSITORY_OR_COMPONENT] for brownfield regression testing.
+Start with discovery only. Read the repository's instructions and current
+test conventions, record the inspected revision, and map the highest-risk
+business capability using source evidence.
+
+Separate intended, implemented, observed, and approved behavior.
+Identify draft user journeys, unresolved test oracles, environment/data
+requirements, and the smallest useful test slice.
+
+Do not edit files, run setup, install tools, change services, publish,
+provision cloud resources, or execute tests/load until separately approved.
+Report what you actually inspected, visible unknowns, and the next review gate.
+```
+
+### Share one source, not divergent copies
+
+The repository's canonical profile is [`.github/agents/brownfield-testing.agent.md`](https://github.com/ashikaiapps/copilot-brownfield-testing/blob/main/.github/agents/brownfield-testing.agent.md). The deployment packaging step copies its exact bytes to the public download; a missing source fails packaging. Review and update the canonical file rather than maintaining a second agent definition.
+
+**Version 1.0.0 SHA-256, LF UTF-8:** `bd45430850561dd59a71a482314ff54451dbb1c983983d42b13b6966b8e8c61e`. Use the hosted page or local HTTP server for the downloadable file; a standalone HTML copy does not include linked assets.
+
+Installation and support references: [custom-agent configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration), [Copilot CLI custom agents](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli), [repository custom agents](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents), and [Copilot app customizations](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app).
 
 ---
 

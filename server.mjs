@@ -5,6 +5,7 @@ const files = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
   ["/playbook.md", ["playbook.md", "text/markdown; charset=utf-8"]],
+  ["/downloads/brownfield-testing.agent.md", [".github/agents/brownfield-testing.agent.md", "text/markdown; charset=utf-8"]],
   ["/version.json", ["version.json", "application/json; charset=utf-8"]],
 ]);
 

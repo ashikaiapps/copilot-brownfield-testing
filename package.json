@@ -5,6 +5,7 @@
   "description": "A static brownfield testing presentation with executable delivery checks.",
   "scripts": {
     "render": "node render.mjs",
+    "package": "node package-site.mjs",
     "start": "node server.mjs",
     "test": "playwright test",
     "test:hosted": "playwright test --project=hosted",

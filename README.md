@@ -8,6 +8,18 @@ The application under test **in this repository is just the presentation page**.
 
 Community references: [morluto/rea](https://github.com/morluto/rea) for authorized evidence-backed investigation, and [petrkindlmann/qa-skills](https://github.com/petrkindlmann/qa-skills) for reviewed QA skills and prompts. These are third-party resources, not built-in Copilot features. Inspect instructions/scripts, authorize execution, and pin reviewed versions; installing skills does not install the separate QA runner.
 
+## Share and install the testing agent
+
+[Download Brownfield Testing Agent](https://ashikaiapps.github.io/copilot-brownfield-testing/downloads/brownfield-testing.agent.md) | [Installation guidance and starter request](https://ashikaiapps.github.io/copilot-brownfield-testing/#agent) | [Canonical profile](.github/agents/brownfield-testing.agent.md)
+
+The client-neutral `brownfield-testing` profile covers evidence-backed discovery, contracts/journeys, risk-based strategy, approved implementation, repeatable environments/data, execution evidence, CI/CD, and authorization-gated Azure planning. Discovery is read-only by default; the profile is not a tool installer, a security boundary, or a coverage guarantee.
+
+Review the download and existing customizations before saving. For a team repository, use `.github/agents/brownfield-testing.agent.md`. For personal Copilot CLI use, use `~/.copilot/agents/brownfield-testing.agent.md` (Windows: `$HOME\.copilot\agents\brownfield-testing.agent.md`). Compare or back up an existing file rather than overwriting it. Select **brownfield-testing** through your host's supported custom-agent picker; host/version support and discovery vary, and an existing session may need restart/reload. Picker hot-loading is not assumed.
+
+The profile sets `disable-model-invocation: true` and `user-invocable: true` for manual selection, while inheriting the host's available model/tools. Downloading does not install dependencies, browsers, or MCP servers, supply credentials, or grant permissions. After selecting the agent, start with: “Assess this authorized repository for brownfield regression testing. Discovery only; do not edit files or run setup.” The presentation provides a fuller copyable request.
+
+`.github/agents/brownfield-testing.agent.md` is the **single source of truth**. `package-site.mjs` copies its exact bytes into `_site/downloads/brownfield-testing.agent.md`; the local HTTP server maps the same public URL directly to the canonical file. A missing input fails packaging. The packager requires `REVISION` to be a full commit SHA and refuses an existing `_site` directory, preventing stale/unlisted files from leaking into the deployment. There is no separately maintained public agent copy or one-click overwriting installer. See the [official configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration) and [CLI setup documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli) for host-specific support.
+
 ## Run locally
 
 Use Node.js 22 or newer:
@@ -19,7 +31,7 @@ npm test
 npm start
 ```
 
-Open <http://127.0.0.1:4173>. Stop the server with Ctrl+C. Playwright starts and stops its own local server when testing. There is no frontend framework or runtime build. `index.html` can also be opened directly, but clipboard access depends on browser permissions and a secure context; failed copies show explicit manual-copy guidance.
+Open <http://127.0.0.1:4173>. Stop the server with Ctrl+C. Playwright starts and stops its own local server when testing. There is no frontend framework or runtime build. `index.html` can also be opened directly for reading, but use the hosted page or local server for the generated download. Clipboard access depends on browser permissions and a secure context; failed copies show explicit manual-copy guidance.
 
 To edit content, update `playbook.md`, run `npm run render`, and commit both the handout and generated `index.html`. `render.mjs` uses the pinned development-only Markdown renderer; it adds the small inline theme/copy controls. CI checks that the committed HTML matches its source. The published page needs no Node.js or third-party scripts, styles, fonts, or network services.
 
@@ -30,6 +42,8 @@ To edit content, update `playbook.md`, run `npm run render`, and commit both the
 | `index.html` | Complete self-contained presentation; semantic headings, anchor navigation, light/dark preference, copy feedback, mobile and print styles |
 | `playbook.md` | Full editable handout and prompt library |
 | `render.mjs` | Small development-only Markdown-to-HTML renderer and page template |
+| `.github/agents/brownfield-testing.agent.md` | Canonical shareable custom-agent profile, manually selected |
+| `package-site.mjs` | Dependency-free static artifact allowlist; derives the public agent download from the canonical source |
 | `server.mjs` | Local static server with an explicit public-file allowlist |
 | `tests/`, `playwright.config.mjs` | Independent browser checks and hosted revision smoke |
 | `playwright.demo.config.mjs`, `tests/demo-failure.spec.mjs` | Isolated, deliberately failing demonstration with its own reports |
@@ -39,7 +53,7 @@ To edit content, update `playbook.md`, run `npm run render`, and commit both the
 
 ## Executable scenarios
 
-Twenty scenarios run in both desktop Chromium and Chromium mobile emulation: **40 checks per local/CI run**. PAGE-09 through PAGE-18 are the ten expanded interaction scenarios; PAGE-19 and PAGE-20 check tool-selection and Azure guidance. A separate post-deployment check brings the main-branch delivery workflow total to **41**. Actual passed, failed, flaky, and skipped counts appear in the Actions job summary and downloadable report.
+Twenty-three scenarios run in the desktop and mobile projects (Chromium and mobile emulation): **46 checks per local/CI run**. PAGE-09 through PAGE-18 are the ten expanded interaction scenarios; PAGE-19 and PAGE-20 check tool-selection and Azure guidance. PAGE-21 and PAGE-23 are file/packaging contracts, not browser user journeys; PAGE-22 exercises the real download. A separate post-deployment check brings the main-branch delivery workflow total to **47**. Actual passed, failed, flaky, and skipped counts appear in the Actions job summary and downloadable report.
 
 | ID | Approved observable outcome |
 |---|---|
@@ -63,7 +77,10 @@ Twenty scenarios run in both desktop Chromium and Chromium mobile emulation: **4
 | PAGE-18 | Narrow-screen reference tables expose column headers and support keyboard horizontal scrolling without overflowing the page |
 | PAGE-19 | Tool selection distinguishes runners/drivers/assertions and coverage instrumentation, preserves reviewed documentation links, and offers an approval-gated prompt |
 | PAGE-20 | Azure guidance distinguishes Playwright Workspaces from JMeter/Locust load testing, preserves official links, and documents cost/approval/no-public-stress boundaries |
-| HOST-01 | Hosted page has the correct title, ten stages, new guidance and framework distinction; `version.json` identifies the exact deployed commit |
+| PAGE-21 | Canonical profile has valid manual-selection frontmatter, a meaningful description, fewer than 30,000 characters, approved workflow/safety content, exact SHA-256 and LF UTF-8 bytes |
+| PAGE-22 | Agent navigation and installation/starter guidance are visible on mobile; HTTP response and actual browser download match canonical bytes and filename; hidden source URL is not served |
+| PAGE-23 | Packaging publishes only the exact allowlist, preserves source bytes/revision, refuses stale staging, and fails explicitly if the canonical agent is missing |
+| HOST-01 | Hosted page preserves the tutorial/guidance; live agent response equals canonical bytes/SHA-256; `version.json` identifies the exact deployed commit |
 
 PAGE-05 and the keyboard activation part of PAGE-06 simulate clipboard denial. PAGE-14 uses a controlled clipboard adapter that rejects once and resolves once to test feedback recovery; it does not claim to exercise the OS clipboard. PAGE-04 uses real clipboard read/write, not a success stub. Real clipboard tests use the same immutable prompt; no tests share server-side mutable data. Browser storage is isolated per test.
 
@@ -71,10 +88,10 @@ These checks do **not** demonstrate exhaustive accessibility, Firefox/WebKit or 
 
 ## CI/CD behavior
 
-- Every pushed branch commit and pull-request update runs the 40 browser checks and source/HTML consistency check. A local commit alone does not trigger GitHub Actions.
+- Every pushed branch commit and pull-request update runs the 46 checks and source/HTML consistency check. A local commit alone does not trigger GitHub Actions.
 - Only `main` pushes (or a manual run on `main`) can deploy, and only after the test job passes. Pull requests use read-only permissions and never deploy; there is no privileged `pull_request_target` execution.
-- The deployment job alone receives `pages: write` and `id-token: write`. Official Pages actions publish **only** `index.html`, `playbook.md`, and a generated `version.json`. Dependencies, reports, and traces are never placed in the public site.
-- The hosted-smoke job waits for successful deployment, uses its actual URL, and compares the hosted revision to `github.sha`; it cannot silently fall back to localhost. Runs for the same branch are serialized across testing, deployment, and smoke to avoid overlapping deployments.
+- The deployment job alone receives `pages: write` and `id-token: write`. Official Pages actions publish **only** `index.html`, `playbook.md`, generated `version.json`, and `downloads/brownfield-testing.agent.md`, copied from the canonical profile. The `.github` directory, dependencies, reports, and traces are never placed in the public site.
+- The hosted-smoke job waits for successful deployment, uses its actual URL, compares the hosted revision to `github.sha`, and verifies the live download byte-for-byte against the checked-out canonical profile; it cannot silently fall back to localhost. Runs for the same branch are serialized across testing, deployment, and smoke to avoid overlapping deployments.
 - HTML reports and failure screenshots/traces are uploaded even on failures, retained for seven days as separate Actions artifacts. This is a public demo: artifacts contain only presentation content. First-attempt failures/retry recoveries appear in reports; **flaky tests fail CI** rather than silently approving deployment. Jobs have bounded timeouts.
 
 The test job blocks deployment. A hosted smoke failure fails the workflow **after** publication; it is not an automatic rollback. Merge blocking also requires an owner to enable a branch ruleset requiring the `test` check; workflow configuration alone does not protect `main`. No nightly suite, business-app environment, or production promotion gate is configured in this intentionally small example.

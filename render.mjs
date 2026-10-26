@@ -3,7 +3,7 @@ import { Marked } from "marked";
 
 const chapters = [
   "overview", "principles", "agenda", "guardrails", "tutorial", "coverage",
-  "skills", "delivery", "demo", "pitfalls", "done", "references", "tools", "azure",
+  "skills", "delivery", "demo", "pitfalls", "done", "references", "tools", "azure", "agent",
 ];
 let stageOpen = false;
 let headline = "";
@@ -183,6 +183,7 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
       <a href="#demo">Demo &amp; CI</a>
       <a href="#tools">Test tools</a>
       <a href="#azure">Azure at scale</a>
+      <a href="#agent">Testing agent</a>
       <a href="#references">References</a>
       <a href="playbook.md">Markdown handout</a>
     </nav>

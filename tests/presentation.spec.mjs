@@ -1,5 +1,12 @@
 import { test, expect } from "@playwright/test";
-import { readFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, unlink } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const agentSource = new URL("../.github/agents/brownfield-testing.agent.md", import.meta.url);
+const agentSha256 = "bd45430850561dd59a71a482314ff54451dbb1c983983d42b13b6966b8e8c61e";
 
 test("PAGE-01: complete ten-stage tutorial and handout", async ({ page, request }) => {
   await page.goto("/");
@@ -141,7 +148,7 @@ test("PAGE-10: chapter navigation and back-to-top reach their destinations", asy
   for (const [label, target] of [
     ["Overview", "overview"], ["10 stages", "tutorial"], ["Coverage", "coverage"],
     ["Skills", "skills"], ["Demo & CI", "demo"], ["Test tools", "tools"],
-    ["Azure at scale", "azure"], ["References", "references"],
+    ["Azure at scale", "azure"], ["Testing agent", "agent"], ["References", "references"],
   ]) {
     await navigation.getByRole("link", { name: label, exact: true }).click();
     await expect(page.locator(`#${target}`)).toBeInViewport();
@@ -319,4 +326,119 @@ test("PAGE-20: Azure guidance distinguishes cloud browsers from authorized proto
   await expect(cloudPrompt).toContainText("without explicit approval.");
   const loadPrompt = page.locator("pre").filter({ hasText: "Use approved [SCENARIO_ID], its contracts" });
   await expect(loadPrompt).toContainText("Never load-test this presentation's Pages site.");
+});
+
+test("PAGE-21: canonical agent has valid manual-invocation metadata and approved safety/workflow content", async () => {
+  const bytes = await readFile(agentSource);
+  const profile = bytes.toString("utf8");
+  expect(profile.length).toBeLessThan(30000);
+  expect(profile).not.toContain("\r");
+  expect(profile.charCodeAt(0)).not.toBe(0xfeff);
+  expect(profile.endsWith("\n")).toBeTruthy();
+  expect(createHash("sha256").update(bytes).digest("hex")).toBe(agentSha256);
+  const header = profile.match(/^---\n([\s\S]*?)\n---\n/);
+  expect(header, "Agent requires YAML frontmatter").not.toBeNull();
+  const fields = Object.fromEntries(header[1].split("\n").map(line => {
+    expect(line).toMatch(/^[a-z-]+: \S.+$/);
+    const colon = line.indexOf(": ");
+    return [line.slice(0, colon), line.slice(colon + 2)];
+  }));
+  expect(fields).toEqual({
+    name: "brownfield-testing",
+    description: expect.stringContaining("Evidence-backed discovery, risk-based test planning"),
+    "disable-model-invocation": "true",
+    "user-invocable": "true",
+  });
+  expect(fields.description.length).toBeGreaterThan(50);
+  expect(profile.match(/^## \d+\./gm)).toHaveLength(11);
+  for (const obligation of [
+    "Version: 1.0.0",
+    "Default discovery is read-only.",
+    "Tool restrictions and approval denials must not be bypassed.",
+    "Do not generate acceptance assertions for disputed rules.",
+    "Do not weaken assertions, hide errors",
+    "Browser contexts isolate browser state, not shared server-side data.",
+    "Do not commit, push, publish artifacts",
+    "do not claim direct ingestion of ordinary Playwright specs.",
+    "No provisioning, cloud identity changes, load execution",
+    "not a tool installer, a security boundary",
+    "scenario_id, rule_ids, persona, priority",
+    "https://github.com/morluto/rea",
+    "https://github.com/petrkindlmann/qa-skills",
+  ]) {
+    expect(profile).toContain(obligation);
+  }
+});
+
+test("PAGE-22: agent navigation, safe installation guidance, and real download preserve canonical bytes", async ({ page, request }, testInfo) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Presentation navigation" })
+    .getByRole("link", { name: "Testing agent", exact: true }).click();
+  await expect(page).toHaveURL(/#agent$/);
+  await expect(page.locator("#agent")).toBeInViewport();
+  const link = page.getByRole("link", { name: "Download Brownfield Testing Agent", exact: true });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute("href", "downloads/brownfield-testing.agent.md");
+  await expect(link).toHaveAttribute("download", "brownfield-testing.agent.md");
+  await expect(page.getByText("~/.copilot/agents/brownfield-testing.agent.md", { exact: true })).toBeVisible();
+  await expect(page.getByText("$HOME\\.copilot\\agents\\brownfield-testing.agent.md", { exact: true })).toBeVisible();
+  await expect(page.getByText("Downloading the file does not install dependencies", { exact: false })).toBeVisible();
+  await expect(page.getByText("restart or reload an existing session if needed", { exact: false })).toBeVisible();
+  const starter = page.locator("pre").filter({ hasText: "Assess [AUTHORIZED_REPOSITORY_OR_COMPONENT]" });
+  await expect(starter).toContainText("Start with discovery only.");
+  await expect(starter).toContainText("until separately approved.");
+  await expect(starter.locator("xpath=preceding-sibling::*[1]").getByRole("button"))
+    .toHaveAccessibleName(/^Copy text block \d+$/);
+  const canonical = await readFile(agentSource);
+  const response = await request.get("downloads/brownfield-testing.agent.md");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("text/markdown");
+  expect(await response.body()).toEqual(canonical);
+  expect((await request.get(".github/agents/brownfield-testing.agent.md")).status()).toBe(404);
+  const downloading = page.waitForEvent("download");
+  await link.click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toBe("brownfield-testing.agent.md");
+  expect(await download.failure()).toBeNull();
+  const saved = testInfo.outputPath("brownfield-testing.agent.md");
+  await download.saveAs(saved);
+  expect(await readFile(saved)).toEqual(canonical);
+  await page.setViewportSize({ width: 320, height: 800 });
+  await expect(link).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
+test("PAGE-23: packaging allowlists exact public files and fails on missing canonical input", async ({}, testInfo) => {
+  const fixture = testInfo.outputPath("package-input");
+  const agentDirectory = join(fixture, ".github", "agents");
+  await mkdir(agentDirectory, { recursive: true });
+  const copiedAgent = join(agentDirectory, "brownfield-testing.agent.md");
+  await copyFile(agentSource, copiedAgent);
+  for (const file of ["index.html", "playbook.md"]) {
+    await copyFile(new URL("../" + file, import.meta.url), join(fixture, file));
+  }
+  const packager = fileURLToPath(new URL("../package-site.mjs", import.meta.url));
+  const revision = "0".repeat(40);
+  const run = () => spawnSync(process.execPath, [packager], {
+    cwd: fixture, env: { ...process.env, REVISION: revision }, encoding: "utf8",
+  });
+  const packaged = run();
+  expect(packaged.error).toBeUndefined();
+  expect(packaged.status, packaged.stderr).toBe(0);
+  const site = join(fixture, "_site");
+  expect((await readdir(site)).sort()).toEqual(["downloads", "index.html", "playbook.md", "version.json"]);
+  expect(await readdir(join(site, "downloads"))).toEqual(["brownfield-testing.agent.md"]);
+  expect(await readFile(join(site, "downloads", "brownfield-testing.agent.md"))).toEqual(await readFile(agentSource));
+  for (const file of ["index.html", "playbook.md"]) {
+    expect(await readFile(join(site, file))).toEqual(await readFile(new URL("../" + file, import.meta.url)));
+  }
+  expect(JSON.parse(await readFile(join(site, "version.json"), "utf8"))).toEqual({ sha: revision });
+  const reused = run();
+  expect(reused.status).not.toBe(0);
+  expect(reused.stderr).toContain("EEXIST");
+  await unlink(copiedAgent);
+  const missing = run();
+  expect(missing.status).not.toBe(0);
+  expect(missing.stderr).toContain("ENOENT");
+  expect(missing.stderr).toContain("brownfield-testing.agent.md");
 });

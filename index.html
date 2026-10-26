@@ -138,6 +138,7 @@ footer { padding: 2rem; border-top: 1px solid var(--cp-border); text-align: cent
       <a href="#demo">Demo &amp; CI</a>
       <a href="#tools">Test tools</a>
       <a href="#azure">Azure at scale</a>
+      <a href="#agent">Testing agent</a>
       <a href="#references">References</a>
       <a href="playbook.md">Markdown handout</a>
     </nav>
@@ -1086,7 +1087,7 @@ Produce discovery artifacts only; do not implement tests yet.
 </tr>
 </tbody></table></div>
 <h3 id="explore-the-automated-delivery-demonstration">Explore the automated delivery demonstration</h3>
-<p>The companion repository runs <strong>20 independent regression scenarios in two browser profiles: 40 checks</strong>, followed by one hosted check against the deployed commit. These tests cover this presentation&#39;s content and interactions, not the fictional purchase-request backend.</p>
+<p>The companion repository runs <strong>23 independent scenarios in desktop and mobile projects: 46 checks</strong>, including agent-profile and packaging contracts, followed by one hosted check against the deployed commit. These tests cover this presentation, its downloads, and delivery mechanics, not the fictional purchase-request backend.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
@@ -1458,6 +1459,40 @@ separate explicit approval. Never load-test this presentation&#39;s Pages site.
 <p>For an approved implementation, review and commit the workload script and load-test YAML, scope OIDC identities to the required resource (for example, the Load Test Contributor role), and protect the trusted execution environment. Verify the exact ready application build, then use an action or CLI supported by the <a href="https://learn.microsoft.com/en-us/azure/app-testing/load-testing/how-to-configure-load-test-cicd">official Azure Load Testing CI/CD guide</a>. Wait for the run, publish approved reports, and fail the gate on execution errors or failed criteria.</p>
 <p>If browser observations under load are required, coordinate separate approved Playwright checks while the load run is active. Apply monitoring, emergency stops, time/concurrency limits, and controlled cleanup; do not confuse separate browser and protocol measurements.</p>
 <p><strong>Implementation boundary:</strong> This update documents Azure testing paths only. It does not configure or run Azure tests, provision resources, install additional test frameworks, or authorize stress traffic to the public presentation site. Existing Playwright CI and Pages deployment remain the implemented demonstration.</p>
+<hr>
+<h2 id="agent">15. Download Brownfield Testing Agent</h2>
+<p>Put this playbook into practice with a reusable, client-neutral <strong>brownfield-testing</strong> custom agent. The profile guides evidence-backed discovery, application mapping, approved user journeys, risk-based test planning, focused implementation, and honest execution reporting across existing testing ecosystems.</p>
+<p><a href="downloads/brownfield-testing.agent.md" download="brownfield-testing.agent.md">Download Brownfield Testing Agent</a></p>
+
+<p><strong>Version:</strong> 1.0.0. <strong>Agent name/ID:</strong> <code>brownfield-testing</code>. This is a repository-discoverable <code>.agent.md</code> custom agent, not an <code>AGENTS.md</code> instructions file or a <code>SKILL.md</code> skill.</p>
+<h3 id="review-install-and-select">Review, install, and select</h3>
+<ol>
+<li>Download and review the profile before sharing it with a client. Review existing customizations before saving; compare or back up an existing file instead of overwriting it.</li>
+<li>For a team repository, save the reviewed file at <code>.github/agents/brownfield-testing.agent.md</code> and follow that repository&#39;s normal review policy. For personal Copilot CLI use, save it at <code>~/.copilot/agents/brownfield-testing.agent.md</code>; on Windows, the equivalent is <code>$HOME\.copilot\agents\brownfield-testing.agent.md</code>.</li>
+<li>Select <code>brownfield-testing</code> using the host&#39;s supported custom-agent picker. Locations, discovery, and picker behavior vary by client and version; restart or reload an existing session if needed and consult the host documentation if the agent does not appear.</li>
+<li>Begin with a bounded discovery request, then approve implementation or execution separately when the scope and expected outcomes are clear.</li>
+</ol>
+<p><strong>Manual selection:</strong> The profile declares <code>disable-model-invocation: true</code> and <code>user-invocable: true</code>. It is designed to be selected by you, not automatically delegated to by another agent. It inherits the host&#39;s available model and tools rather than hardcoding a model, tool list, cloud identity, or client-specific path.</p>
+<p><strong>Safety boundaries:</strong> Discovery is read-only by default. The agent separates observed behavior from approved requirements, preserves useful existing tests, reports uncertainty, and requires authorization for installations, external effects, publishing, fault injection, load tests, and billable cloud work. Downloading the file does not install dependencies, MCP servers, or browsers, supply credentials, or grant permissions. The profile complements technical controls; it is not a security boundary or a guarantee of coverage.</p>
+<h3 id="starter-request">Starter request</h3>
+<p>After selecting the agent, replace the bracketed scope and paste:</p>
+<pre><code class="language-text">Assess [AUTHORIZED_REPOSITORY_OR_COMPONENT] for brownfield regression testing.
+Start with discovery only. Read the repository&#39;s instructions and current
+test conventions, record the inspected revision, and map the highest-risk
+business capability using source evidence.
+
+Separate intended, implemented, observed, and approved behavior.
+Identify draft user journeys, unresolved test oracles, environment/data
+requirements, and the smallest useful test slice.
+
+Do not edit files, run setup, install tools, change services, publish,
+provision cloud resources, or execute tests/load until separately approved.
+Report what you actually inspected, visible unknowns, and the next review gate.
+</code></pre>
+<h3 id="share-one-source-not-divergent-copies">Share one source, not divergent copies</h3>
+<p>The repository&#39;s canonical profile is <a href="https://github.com/ashikaiapps/copilot-brownfield-testing/blob/main/.github/agents/brownfield-testing.agent.md"><code>.github/agents/brownfield-testing.agent.md</code></a>. The deployment packaging step copies its exact bytes to the public download; a missing source fails packaging. Review and update the canonical file rather than maintaining a second agent definition.</p>
+<p><strong>Version 1.0.0 SHA-256, LF UTF-8:</strong> <code>bd45430850561dd59a71a482314ff54451dbb1c983983d42b13b6966b8e8c61e</code>. Use the hosted page or local HTTP server for the downloadable file; a standalone HTML copy does not include linked assets.</p>
+<p>Installation and support references: <a href="https://docs.github.com/en/copilot/reference/custom-agents-configuration">custom-agent configuration</a>, <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli">Copilot CLI custom agents</a>, <a href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents">repository custom agents</a>, and <a href="https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app">Copilot app customizations</a>.</p>
 <hr>
 <p><strong>Final takeaway</strong></p>
 <blockquote>
