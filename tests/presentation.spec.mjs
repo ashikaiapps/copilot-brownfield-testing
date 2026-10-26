@@ -384,6 +384,9 @@ test("PAGE-22: agent navigation, safe installation guidance, and real download p
   await expect(page.getByText("restarting is not a guaranteed registration fix.", { exact: false })).toBeVisible();
   await expect(page.getByText("Desktop picker discovery has not been verified.", { exact: false })).toBeVisible();
   await expect(page.getByText("it does not register a picker agent", { exact: true })).toBeVisible();
+  const cli = page.locator("pre").filter({ hasText: "copilot --agent brownfield-testing" });
+  await expect(cli.locator("code")).toHaveText("copilot --agent brownfield-testing\n");
+  await expect(page.getByText("that check did not execute application work or establish desktop picker availability.", { exact: false })).toBeVisible();
   const fallback = page.locator("pre").filter({ hasText: "Read [REVIEWED_LOCAL_PROFILE_PATH]" });
   await expect(fallback).toContainText("This is task guidance, not a request");
   await expect(fallback).toContainText("without separate approval.");

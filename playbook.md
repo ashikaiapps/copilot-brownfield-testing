@@ -1180,6 +1180,16 @@ provision cloud resources, or execute tests/load until separately approved.
 Report what you actually inspected, visible unknowns, and the next review gate.
 ```
 
+### Copilot CLI alternative
+
+With Copilot CLI installed and the reviewed profile in its supported repository or personal agent location, launch it from the authorized repository:
+
+```shell
+copilot --agent brownfield-testing
+```
+
+This selects the profile in the CLI; it does not register an entry in the desktop picker or grant additional permissions. Then use the discovery-only starter request above. CLI profile loading was confirmed in a bounded identity-only check with tools disabled; that check did not execute application work or establish desktop picker availability.
+
 ### If the agent is absent from the picker
 
 Save the reviewed download in an approved location readable from an authorized repository session, then explicitly ask Copilot to read it and follow the workflow for the current task. This applies task instructions; **it does not register a picker agent**, install tools, or change permissions.

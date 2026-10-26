@@ -1489,6 +1489,11 @@ Do not edit files, run setup, install tools, change services, publish,
 provision cloud resources, or execute tests/load until separately approved.
 Report what you actually inspected, visible unknowns, and the next review gate.
 </code></pre>
+<h3 id="copilot-cli-alternative">Copilot CLI alternative</h3>
+<p>With Copilot CLI installed and the reviewed profile in its supported repository or personal agent location, launch it from the authorized repository:</p>
+<pre><code class="language-shell">copilot --agent brownfield-testing
+</code></pre>
+<p>This selects the profile in the CLI; it does not register an entry in the desktop picker or grant additional permissions. Then use the discovery-only starter request above. CLI profile loading was confirmed in a bounded identity-only check with tools disabled; that check did not execute application work or establish desktop picker availability.</p>
 <h3 id="if-the-agent-is-absent-from-the-picker">If the agent is absent from the picker</h3>
 <p>Save the reviewed download in an approved location readable from an authorized repository session, then explicitly ask Copilot to read it and follow the workflow for the current task. This applies task instructions; <strong>it does not register a picker agent</strong>, install tools, or change permissions.</p>
 <pre><code class="language-text">Read [REVIEWED_LOCAL_PROFILE_PATH] and follow its brownfield testing workflow
