@@ -1,0 +1,94 @@
+name: Test and deploy presentation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: presentation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify committed HTML matches the handout
+        run: npm run render && git diff --exit-code -- index.html
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Stage only public presentation files
+        env:
+          REVISION: ${{ github.sha }}
+        run: |
+          mkdir _site
+          cp index.html playbook.md _site/
+          printf '{"sha":"%s"}\n' "$REVISION" > _site/version.json
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - uses: actions/deploy-pages@v4
+        id: deployment
+
+  hosted-smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:hosted
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.url }}
+          EXPECTED_SHA: ${{ github.sha }}
+      - name: Preserve hosted smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-smoke-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

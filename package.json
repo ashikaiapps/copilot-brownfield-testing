@@ -1,0 +1,16 @@
+{
+  "name": "copilot-brownfield-testing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A static brownfield testing presentation with executable delivery checks.",
+  "scripts": {
+    "render": "node render.mjs",
+    "start": "node server.mjs",
+    "test": "playwright test",
+    "test:hosted": "playwright test --project=hosted"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "marked": "17.0.1"
+  }
+}
